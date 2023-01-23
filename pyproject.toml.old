@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "my-c2l"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+
+
+
+
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+pytorch-triton = {url="https://download.pytorch.org/whl/nightly/pytorch_triton-2.0.0%2B0d7e753227-cp311-cp311-linux_x86_64.whl"}
+torch = {path="/home/shino/packages/torch-2.0.0.dev20230121+cu118-cp311-cp311-linux_x86_64.whl"}
+transformers = "^4.25.1"
+pandas = "^1.5.3"
+jupyter = "^1.0.0"
+
+
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
