@@ -1,4 +1,7 @@
-MAX_ROWS = 1000
+MAX_ROWS = 100
+MAX_ROWS = int(100/0.65)
+
+
 DATASET = "imdb"
 DATASET_PATH = f"datasets/{DATASET}"
 
