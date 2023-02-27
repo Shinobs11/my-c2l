@@ -4,8 +4,8 @@
 
 
 
-DATASET=original_augmented_1x_aclImdb
-# DATASET=yelp_chi
+# DATASET=original_augmented_1x_aclImdb
+DATASET=yelp_chi
 
 python3 main.py \
 --generate-triplets \

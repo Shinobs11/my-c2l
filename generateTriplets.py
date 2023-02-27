@@ -33,7 +33,7 @@ def generateTiplets(
   #! convert these into arguments
   TOPK_NUM = 4
   DROPOUT_RATIO = 0.5
-  MAX_MASKING_ATTEMPTS = 24
+  MAX_MASKING_ATTEMPTS = 100
 
   import json
 
@@ -47,8 +47,8 @@ def generateTiplets(
   device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
   train_set = pload(os.path.join(DATASET_PATH, "train_set"))
-  train_texts = train_set["text"].tolist()[0:100]
-  train_labels = train_set["label"].tolist()[0:100]
+  train_texts = train_set["text"].tolist()
+  train_labels = train_set["label"].tolist()
 
   train_encodings = tokenizer(train_texts, padding=True, truncation=True)
   train_dataset = IMDBDataset(labels=train_labels, encodings=train_encodings)
@@ -77,9 +77,9 @@ def generateTiplets(
 
 
   def compute_importances(data_loader:DataLoader) -> list[Tensor]:
-    model:BertForSequenceClassification = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH, 'best_epoch'), num_labels=num_classes) #type:ignore
+    model:BertForSequenceClassification = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH, 'best_epoch'), output_hidden_states=True, num_labels=num_classes) #type:ignore
     model.to(device)
-    
+
     def get_gradient_norms(batch):
       input_ids:Tensor = batch['input_ids'].to(device)
       attention_mask:Tensor = batch['attention_mask'].to(device)
@@ -88,21 +88,24 @@ def generateTiplets(
       importances = []
       for i in range(input_ids.shape[0]):
 
-        model.bert.embeddings.position_embeddings.weight.grad = None
+        
         outputs:SequenceClassifierOutput | tuple[Tensor] = model.forward(input_ids=input_ids[i].unsqueeze(dim=0), attention_mask=attention_mask[i].unsqueeze(dim=0), labels=labels[i].unsqueeze(dim=0), return_dict=True)
         assert isinstance(outputs, SequenceClassifierOutput)
 
         loss = outputs['loss']
+
         loss.backward(retain_graph=True)
         torch.cuda.empty_cache()
 
 
-        assert isinstance(model.bert.embeddings.position_embeddings.weight.grad, Tensor)
-        assert isinstance(model.bert.embeddings.word_embeddings.weight.grad, Tensor)
-        norm:Tensor = lin.norm(model.bert.embeddings.position_embeddings.weight.grad[0:token_len], ord=2, dim=1, dtype=torch.float64).detach().to(device)
+        # assert isinstance(model.bert.embeddings.position_embeddings.weight.grad, Tensor)
+        # assert isinstance(model.bert.embeddings.word_embeddings.weight.grad, Tensor)
+        norm:Tensor = lin.norm(model.bert.embeddings.position_embeddings.weight.grad, ord=2, dim=1, dtype=torch.float64).detach().to(device)
+        # norm:Tensor = lin.norm(outputs['hidden_states'][11].squeeze(), ord=2, dim=1, dtype=torch.float64).detach().to(device)
 
+        # model.bert.embeddings.position_embeddings.weight.grad = None
         importances.append(norm)
-      
+
       return importances
 
         
@@ -172,7 +175,6 @@ def generateTiplets(
   mlm_model.eval()
 
   def mask_data(data_loader:DataLoader, all_importances: list[Tensor], sampling_ratio, augment_ratio):
-    print("herllo")
     triplets = []
     error_count = 0
     no_flip_count = 0
@@ -335,6 +337,9 @@ def generateTiplets(
 
 
         if len(torch.unique(recon_prediction)) != 1:
+
+          causal_mask[importance_index] = 1
+          find_flag = True
           j = {
               "original": tokenizer.decode(input_ids[0], skip_special_tokens=True, clean_up_tokenization_spaces=True),
               "original_word": tokenizer.decode(torch.unsqueeze(input_ids[0][importance_index + 1], dim=0)),
@@ -348,8 +353,6 @@ def generateTiplets(
             }
           )
           json_file.write(json.dumps(j, indent=2))
-          causal_mask[importance_index] = 1
-          find_flag = True
           break
 
       if find_flag:

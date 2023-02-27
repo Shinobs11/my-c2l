@@ -210,8 +210,8 @@ def pretrainBERT(
             logits = outputs['logits']
             _, pred_labels_idx = logits.max(dim=1)
             _, true_labels_idx = true_labels.max(dim=1)
-            print("Preds:",pred_labels_idx)
-            print("Trues:",true_labels_idx)
+            # print("Preds:",pred_labels_idx)
+            # print("Trues:",true_labels_idx)
             valid_metrics.update(pred_labels_idx, true_labels_idx)
   
         accuracy = valid_metrics.compute().item()

@@ -33,7 +33,7 @@ def constrastiveTrain(
 
   DATASET_NAME = dataset_name
   DATASET_PATH = f"datasets/{DATASET_NAME}/augmented_triplets"
-  OUTPUT_PATH = f"checkpoints/{DATASET_NAME}/model"
+  OUTPUT_PATH = f"checkpoints/{DATASET_NAME}/augmented_model"
   EPOCH_NUM = epoch_num
   TOPK_NUM = 4
   BATCH_SIZE = batch_size
@@ -46,7 +46,6 @@ def constrastiveTrain(
 
 
   train_set:pd.DataFrame = pload(os.path.join(DATASET_PATH, 'train_set'))
-  # test_set:pd.DataFrame = pload(os.path.join(DATASET_PATH, 'test_set'))
   valid_set:pd.DataFrame = pload(os.path.join(DATASET_PATH, 'valid_set'))
 
   train_labels = train_set['label']
@@ -112,8 +111,6 @@ def constrastiveTrain(
     epoch_loss = []
     model.train()
     train_progress_bar = tqdm(train_loader)
-    train_correct_count = 0
-    train_total_size = 0
     for batch in train_progress_bar:
       optim.zero_grad()
 
@@ -164,73 +161,55 @@ def constrastiveTrain(
       _, true_labels_idx = true_labels.max(dim=1)
       _, pred_labels_idx = logits.max(dim=1)
 
+      train_metrics.update(pred_labels_idx, true_labels_idx)
 
 
       loss.sum().backward()
 
-      train_progress_bar.set_description("Batch Accuracy: %f" % batch_accuracy)
+      train_progress_bar.set_description("Epoch train accuracy: %f" % train_metrics.compute().item())
       optim.step()
       scheduler.step()
       steps += 1
 
-    print(f"Total Train Accuracy: {total_train_accuracy}")
+    # print(f"Total Train Accuracy: {total_train_accuracy}")
 
     model.eval()
-    cor_cnt = 0
-    total_size = 0
-    accuracy = 0
     for batch in valid_loader:
         with torch.no_grad():
             anc_input_ids = batch['anchor_input_ids'].to(device)
             anc_attention_mask = batch['anchor_attention_mask'].to(device)
             anc_token_type_ids = batch['anchor_token_type_ids'].to(device)
-            labels = batch['labels'].to(device)
+            true_labels = batch['labels'].to(device)
             outputs = model(
                     anc_input_ids,
                     anc_attention_mask,
                     anchor_token_type_ids=anc_token_type_ids)
 
             logits = outputs[0]
-            cor_cnt += correct_count(logits, labels)
-            total_size += len(labels)
+            _, pred_labels_idx = logits.max(dim=1)
+            _, true_labels_idx = true_labels.max(dim=1)
+            valid_metrics.update(pred_labels_idx, true_labels_idx)
 
-    if total_size:
-        accuracy = cor_cnt * 1.0 / total_size
-
+    accuracy = valid_metrics.compute().item()
     if accuracy >= best_acc:
         best_epoch = epoch
         best_acc = accuracy
     print(f"Accuracy: {accuracy}")
-    model.module.save_pretrained(os.path.join(OUTPUT_PATH, f"epoch_{epoch}"))
-
-  with open(os.path.join(OUTPUT_PATH, "training_loss.pkl"), 'wb') as f:
-      pickle.dump(all_loss, f)
-  print(f"\nBest Model is epoch {best_epoch}. load and evaluate test...")
+    model.save_pretrained(os.path.join(OUTPUT_PATH, f"epoch_{epoch}")) #type:ignore
+  pdump(all_loss, os.path.join(OUTPUT_PATH,"training_loss"))
+  print(f"\nBest Model is epoch {best_epoch}.")
+  print(f"\nBest accuracy is {best_acc}")
+  try:
+      for x in glob.glob(os.path.join(OUTPUT_PATH, "best_epoch", "*")):
+        os.remove(x)
+      os.rmdir(os.path.join(OUTPUT_PATH, "best_epoch"))
+  except:
+      pass
   os.rename(os.path.join(OUTPUT_PATH, f"epoch_{best_epoch}"), os.path.join(OUTPUT_PATH, "best_epoch"))
-  model = BertForCounterfactualRobustness.from_pretrained(os.path.join(OUTPUT_PATH, "best_epoch"), num_labels=num_classes)
-  model.to(device)
-  model.eval()
-
-  # Test
-  cor_cnt = 0
-  total_size = 0
-  for batch in test_loader:
-      with torch.no_grad():
-          anc_input_ids = batch['anchor_input_ids'].to(device)
-          anc_attention_mask = batch['anchor_attention_mask'].to(device)
-          anc_token_type_ids = batch['anchor_token_type_ids'].to(device)
-          labels = batch['labels'].to(device)
-          outputs = model(
-                  anc_input_ids, 
-                  anc_attention_mask,
-                  anchor_token_type_ids=anc_token_type_ids)
-
-          logits = outputs[0]
-          cor_cnt += correct_count(logits, labels)
-          total_size += len(labels)
-
-  accuracy = cor_cnt * 1.0 / total_size
-  print(f"Test Accuracy: {accuracy}")
-
-  pass
-
+  try:
+      for x in glob.glob(os.path.join(OUTPUT_PATH, "epoch_*")):
+        for y in glob.glob(os.path.join(x, "*")):
+          os.remove(y)
+        os.rmdir(x)
+  except:
+      pass

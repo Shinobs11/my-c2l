@@ -1,0 +1,46 @@
+{
+  "original": "a somewhat dull made for tv movie which premiered on the tbs cable station. antonio and janine run around chasing a killer computer virus and... that's about it. for trivia buffs this will be noted as debuting the same weekend that the real life'melissa'virus also made it's debut in e - mail inboxes across the world.",
+  "original_word": "somewhat",
+  "replacement_words": [
+    "a",
+    ".",
+    "s o m e w h a t",
+    "t o"
+  ],
+  "replacement_position": 2,
+  "replacing_token_caused_flip": false,
+  "candidate_0": "a a dull made for tv movie which premiered on the tbs cable station. antonio and janine run around chasing a killer computer virus and... that's about it. for trivia buffs this will be noted as debuting the same weekend that the real life'melissa'virus also made it's debut in e - mail inboxes across the world.",
+  "candidate_1": "a. dull made for tv movie which premiered on the tbs cable station. antonio and janine run around chasing a killer computer virus and... that's about it. for trivia buffs this will be noted as debuting the same weekend that the real life'melissa'virus also made it's debut in e - mail inboxes across the world.",
+  "candidate_2": "a somewhat dull made for tv movie which premiered on the tbs cable station. antonio and janine run around chasing a killer computer virus and... that's about it. for trivia buffs this will be noted as debuting the same weekend that the real life'melissa'virus also made it's debut in e - mail inboxes across the world.",
+  "candidate_3": "a to dull made for tv movie which premiered on the tbs cable station. antonio and janine run around chasing a killer computer virus and... that's about it. for trivia buffs this will be noted as debuting the same weekend that the real life'melissa'virus also made it's debut in e - mail inboxes across the world."
+}{
+  "original": "i've seen a lot of stupid plotlines in my time, but this one is among the worst. after catching some disease in space, an astronaut comes back to earth and starts melting. he then goes on a rampage, killing people ( how is beyond me ; i just watch them, i can't explain them. ) this is the kind of movie that shouldn't have been made in the first place.",
+  "original_word": "worst",
+  "replacement_words": [
+    "w o r s t",
+    "b e s t",
+    "w o r s e",
+    "m o s t"
+  ],
+  "replacement_position": 21,
+  "replacing_token_caused_flip": false,
+  "candidate_0": "i've seen a lot of stupid plotlines in my time, but this one is among the worst. after catching some disease in space, an astronaut comes back to earth and starts melting. he then goes on a rampage, killing people ( how is beyond me ; i just watch them, i can't explain them. ) this is the kind of movie that shouldn't have been made in the first place.",
+  "candidate_1": "i've seen a lot of stupid plotlines in my time, but this one is among the best. after catching some disease in space, an astronaut comes back to earth and starts melting. he then goes on a rampage, killing people ( how is beyond me ; i just watch them, i can't explain them. ) this is the kind of movie that shouldn't have been made in the first place.",
+  "candidate_2": "i've seen a lot of stupid plotlines in my time, but this one is among the worse. after catching some disease in space, an astronaut comes back to earth and starts melting. he then goes on a rampage, killing people ( how is beyond me ; i just watch them, i can't explain them. ) this is the kind of movie that shouldn't have been made in the first place.",
+  "candidate_3": "i've seen a lot of stupid plotlines in my time, but this one is among the most. after catching some disease in space, an astronaut comes back to earth and starts melting. he then goes on a rampage, killing people ( how is beyond me ; i just watch them, i can't explain them. ) this is the kind of movie that shouldn't have been made in the first place."
+}{
+  "original": "hopalong cassidy with a horse who is not white & not named topper? go figure! < br / > < br / > this travesty does a gross injustice to the greatest of all cowboy heroes, hopalong cassidy. the actor who plays him is young versus old, blond haired versus white haired and kills people versus shooting the gun out of their hands. will the real hopalong please stand up! < br / > < br / > one of the worst movies ever made &, believe it or not, by the person who brought us the grandfather saga!",
+  "original_word": "worst",
+  "replacement_words": [
+    "w o r s t",
+    "b e s t",
+    "g r e a t e s t",
+    "b a d"
+  ],
+  "replacement_position": 98,
+  "replacing_token_caused_flip": false,
+  "candidate_0": "hopalong cassidy with a horse who is not white & not named topper? go figure! < br / > < br / > this travesty does a gross injustice to the greatest of all cowboy heroes, hopalong cassidy. the actor who plays him is young versus old, blond haired versus white haired and kills people versus shooting the gun out of their hands. will the real hopalong please stand up! < br / > < br / > one of the worst movies ever made &, believe it or not, by the person who brought us the grandfather saga!",
+  "candidate_1": "hopalong cassidy with a horse who is not white & not named topper? go figure! < br / > < br / > this travesty does a gross injustice to the greatest of all cowboy heroes, hopalong cassidy. the actor who plays him is young versus old, blond haired versus white haired and kills people versus shooting the gun out of their hands. will the real hopalong please stand up! < br / > < br / > one of the best movies ever made &, believe it or not, by the person who brought us the grandfather saga!",
+  "candidate_2": "hopalong cassidy with a horse who is not white & not named topper? go figure! < br / > < br / > this travesty does a gross injustice to the greatest of all cowboy heroes, hopalong cassidy. the actor who plays him is young versus old, blond haired versus white haired and kills people versus shooting the gun out of their hands. will the real hopalong please stand up! < br / > < br / > one of the greatest movies ever made &, believe it or not, by the person who brought us the grandfather saga!",
+  "candidate_3": "hopalong cassidy with a horse who is not white & not named topper? go figure! < br / > < br / > this travesty does a gross injustice to the greatest of all cowboy heroes, hopalong cassidy. the actor who plays him is young versus old, blond haired versus white haired and kills people versus shooting the gun out of their hands. will the real hopalong please stand up! < br / > < br / > one of the bad movies ever made &, believe it or not, by the person who brought us the grandfather saga!"
+}

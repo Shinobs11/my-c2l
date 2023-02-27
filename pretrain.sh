@@ -5,8 +5,8 @@
 
 # DATASET=fake_news_1
 # DATASET=imdb
-DATASET=original_augmented_1x_aclImdb
-# DATASET=yelp_chi
+# DATASET=original_augmented_1x_aclImdb
+DATASET=yelp_chi
 echo "Starting preTraining script..."
 for i in "0"
 do
@@ -15,7 +15,7 @@ python3 main.py \
 --pretrain \
 --dataset-name $DATASET \
 --batch-size 8 \
---epoch-num 10 \
+--epoch-num 20 \
 --use-margin-loss \
 --use-cache
 done
