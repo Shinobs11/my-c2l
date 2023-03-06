@@ -1,17 +1,17 @@
 import json, os, pickle, torch, logging, typing, numpy as np, glob, argparse
+from re import L
 from torch.utils.data import DataLoader, Dataset
 from pathlib import Path
 from tqdm import tqdm
 from transformers import BertTokenizerFast, BertForMaskedLM, BertForSequenceClassification, get_linear_schedule_with_warmup
 import transformers as T
 from logging.handlers import RotatingFileHandler
-
+from src.logging.logSetup import mainLogger
 from src.utils.pickleUtils import pdump, pload, pjoin
 from src.proecssing import correct_count
 from transformers.models.bert.modeling_bert import SequenceClassifierOutput
 from torch import Tensor
-from  src.classes.datasets import CFClassifcationDataset, CFIMDbDataset, IMDBDataset
-import pickle
+from  src.classes.datasets import CFClassifcationDataset, ClassificationDataset
 import pandas as pd
 from src.classes.model import BertForCounterfactualRobustness
 
@@ -22,13 +22,22 @@ from torchmetrics.classification import MulticlassAccuracy
 
 import json
 
+handler = RotatingFileHandler(
+    "logs/contrastiveLearning.log",
+    maxBytes=10000000,  
+)
+
+log = logging.getLogger("contrastiveLearning")
+log.setLevel(logging.DEBUG)
+log.addHandler(handler)
+
+
+
 def constrastiveTrain(
   dataset_name: str,
   batch_size: int,
   epoch_num: int,
-  use_margin_loss: bool,
-  lambda_weight: float,
-  use_cache: bool
+  lambda_weight: float
 ):
 
   DATASET_NAME = dataset_name
@@ -44,29 +53,25 @@ def constrastiveTrain(
 
 
 
-
   train_set:pd.DataFrame = pload(os.path.join(DATASET_PATH, 'train_set'))
   valid_set:pd.DataFrame = pload(os.path.join(DATASET_PATH, 'valid_set'))
 
-  train_labels = train_set['label']
-  valid_labels = valid_set['label']
 
-  anchor_train_texts = train_set['anchor_text']
-  anchor_valid_texts = valid_set['anchor_text']
+  train_labels = train_set['label'].to_list()
+  valid_labels = valid_set['label'].to_list()
 
-  positive_train_texts = train_set['positive_text']
-  positive_valid_texts = valid_set['positive_text']
+  
+  anchor_train_texts = train_set['anchor_text'].to_list()
+  anchor_valid_texts = valid_set['text'].to_list()
 
-  negative_train_texts = train_set['negative_text']
-  negative_valid_texts = valid_set['negative_text']
+  positive_train_texts = train_set['positive_text'].to_list()
 
-  train_triplet_sample_masks = None
-  valid_triplet_sample_masks = None
 
-  if 'triplet_sample_mask' in train_set[0].keys():
-    train_triplet_sample_masks = train_set['triplet_sample_mask']
-  if 'triplet_sample_mask' in valid_set[0].keys():
-    valid_triplet_sample_masks = valid_set['triplet_sample_mask']
+  negative_train_texts = train_set['negative_text'].to_list()
+
+
+  train_triplet_sample_masks = train_set['triplet_sample_mask'].to_list()
+
 
 
   tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
@@ -74,14 +79,13 @@ def constrastiveTrain(
   anchor_valid_encodings = tokenizer(anchor_valid_texts, truncation=True, padding=True)
 
   positive_train_encodings = tokenizer(positive_train_texts, truncation=True, padding=True)
-  positive_valid_encodings = tokenizer(positive_valid_texts, truncation=True, padding=True)
+
 
   negative_train_encodings = tokenizer(negative_train_texts, truncation=True, padding=True)
-  negative_valid_encodings = tokenizer(negative_valid_texts, truncation=True, padding=True)
 
 
   train_dataset = CFClassifcationDataset(anchor_train_encodings, positive_train_encodings, negative_train_encodings, train_triplet_sample_masks, train_labels)
-  valid_dataset = CFClassifcationDataset(anchor_valid_encodings, positive_valid_encodings, negative_valid_encodings, valid_triplet_sample_masks, valid_labels)
+  valid_dataset = ClassificationDataset(anchor_valid_encodings, valid_labels)
 
   train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
   valid_loader = DataLoader(valid_dataset, batch_size=BATCH_SIZE, shuffle=False)
@@ -105,56 +109,50 @@ def constrastiveTrain(
   steps = 0
   all_loss = []
   for epoch in range(EPOCH_NUM):
-    train_metrics: MulticlassAccuracy = MulticlassAccuracy(num_classes=num_classes)
-    valid_metrics: MulticlassAccuracy = MulticlassAccuracy(num_classes=num_classes)
+    train_metrics: MulticlassAccuracy = MulticlassAccuracy(num_classes=num_classes).to(device)
+    valid_metrics: MulticlassAccuracy = MulticlassAccuracy(num_classes=num_classes).to(device)
 
-    epoch_loss = []
     model.train()
     train_progress_bar = tqdm(train_loader)
     for batch in train_progress_bar:
       optim.zero_grad()
 
-      anchor_input_ids = batch['anchor_input_ids'].to(device)
-      anchor_attention_mask = batch['anchor_attention_mask'].to(device)
-      anchor_token_type_ids = batch['anchor_token_type_ids'].to(device)
+      anchor_input_ids = batch['anchor_input_ids'].to(device, dtype=torch.long)
+      anchor_attention_mask = batch['anchor_attention_mask'].to(device, dtype=torch.long)
+      anchor_token_type_ids = batch['anchor_token_type_ids'].to(device, dtype=torch.long)
 
-      positive_input_ids = batch['positive_input_ids'].to(device)
-      positive_attention_mask = batch['positive_attention_mask'].to(device)
-      positive_token_type_ids = batch['positive_token_type_ids'].to(device)
+      positive_input_ids = batch['positive_input_ids'].to(device, dtype=torch.long)
+      positive_attention_mask = batch['positive_attention_mask'].to(device, dtype=torch.long)
+      positive_token_type_ids = batch['positive_token_type_ids'].to(device, dtype=torch.long)
 
-      negative_input_ids = batch['negative_input_ids'].to(device)
-      negative_attention_mask= batch['negative_attention_mask'].to(device)
-      negative_token_type_ids = batch['negative_token_type_ids'].to(device)
+      negative_input_ids = batch['negative_input_ids'].to(device, dtype=torch.long)
+      negative_attention_mask= batch['negative_attention_mask'].to(device, dtype=torch.long)
+      negative_token_type_ids = batch['negative_token_type_ids'].to(device, dtype=torch.long)
       
       triplet_sample_masks = batch['triplet_sample_masks'].to(device)
 
-      labels = batch['labels'].to(device)
+      labels = batch['labels'].to(device, dtype=torch.float) 
+
 
       true_labels = labels
-      # _, labels = torch.max(labels, dim = 1) 
+      _, labels = torch.max(labels, dim = 1) 
 
 
-      if use_margin_loss:
-            #outputs = model(anc_input_ids, anc_attention_mask, pos_input_ids, pos_attention_mask, neg_input_ids, neg_attention_mask, labels=labels)
-        outputs = model(
-          anchor_input_ids, 
-          anchor_attention_mask, 
-          positive_input_ids, 
-          positive_attention_mask, 
-          negative_input_ids, 
-          negative_attention_mask, 
-          anchor_token_type_ids=anchor_token_type_ids,
-          positive_token_type_ids=positive_token_type_ids,
-          negative_token_type_ids=negative_token_type_ids,
-          triplet_sample_masks=triplet_sample_masks, 
-          lambda_weight=lambda_weight, 
-          labels=labels)
-      else:
-        outputs = model(
-          anchor_input_ids,
-          anchor_attention_mask ,
-          anchor_token_type_ids=anchor_token_type_ids,
-          labels=labels)
+   
+      outputs = model.forward(
+        anchor_input_ids=anchor_input_ids, 
+        anchor_attention_mask=anchor_attention_mask, 
+        positive_input_ids = positive_input_ids, 
+        positive_attention_mask= positive_attention_mask, 
+        negative_input_ids= negative_input_ids, 
+        negative_attention_mask= negative_attention_mask, 
+        anchor_token_type_ids=anchor_token_type_ids,
+        positive_token_type_ids=positive_token_type_ids,
+        negative_token_type_ids=negative_token_type_ids,
+        triplet_sample_masks=triplet_sample_masks, 
+        lambda_weight=lambda_weight, 
+        labels=labels)
+
       loss = outputs[0]
       logits = outputs[1]
 
@@ -174,31 +172,39 @@ def constrastiveTrain(
     # print(f"Total Train Accuracy: {total_train_accuracy}")
 
     model.eval()
+    accuracy = 0.0
     for batch in valid_loader:
         with torch.no_grad():
-            anc_input_ids = batch['anchor_input_ids'].to(device)
-            anc_attention_mask = batch['anchor_attention_mask'].to(device)
-            anc_token_type_ids = batch['anchor_token_type_ids'].to(device)
+            input_ids = batch['input_ids'].to(device)
+            attention_mask = batch['attention_mask'].to(device)
+            token_type_ids = batch['token_type_ids'].to(device)
             true_labels = batch['labels'].to(device)
             outputs = model(
-                    anc_input_ids,
-                    anc_attention_mask,
-                    anchor_token_type_ids=anc_token_type_ids)
+                    anchor_input_ids = input_ids,
+                    anchor_attention_mask = attention_mask,
+                    anchor_token_type_ids = token_type_ids
+                    )
 
             logits = outputs[0]
             _, pred_labels_idx = logits.max(dim=1)
             _, true_labels_idx = true_labels.max(dim=1)
+
+            log.debug(f"pred_labels_idx: {pred_labels_idx} true_labels_idx: {true_labels_idx}\n")
+
             valid_metrics.update(pred_labels_idx, true_labels_idx)
 
     accuracy = valid_metrics.compute().item()
+    log.debug(f"Validation accuracy for epoch {epoch}: {accuracy}")
     if accuracy >= best_acc:
         best_epoch = epoch
         best_acc = accuracy
     print(f"Accuracy: {accuracy}")
+    mainLogger.info(f"contrastiveLearning epoch {epoch} finished with {accuracy} accuracy.")
     model.save_pretrained(os.path.join(OUTPUT_PATH, f"epoch_{epoch}")) #type:ignore
   pdump(all_loss, os.path.join(OUTPUT_PATH,"training_loss"))
   print(f"\nBest Model is epoch {best_epoch}.")
   print(f"\nBest accuracy is {best_acc}")
+  mainLogger.info(f"contrastiveLearning finished with best epoch being {best_epoch} with {best_acc} accuracy.")
   try:
       for x in glob.glob(os.path.join(OUTPUT_PATH, "best_epoch", "*")):
         os.remove(x)
@@ -213,3 +219,10 @@ def constrastiveTrain(
         os.rmdir(x)
   except:
       pass
+
+
+
+
+### Configuring misc. stuff
+from transformers import logging
+logging.set_verbosity_error()

@@ -2,6 +2,9 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 import typing
+
+
+cwd = os.path.split(__file__)[0]
 def logSetup(
   logger_name: str,
   logger_path: str,
@@ -23,3 +26,5 @@ def logSetup(
   
   return log
 
+
+mainLogger = logSetup("main", f"{cwd}/../../logs/main.log", logging.INFO, None)

@@ -1,0 +1,9 @@
+transformers==4.26.0
+pandas==1.5.3
+blosc==1.11.1
+pybind11==2.10.3
+scikit-learn==1.2.1
+jupyter==1.0.0
+ipywidgets==8.0.4
+torchmetrics==0.11.1
+matplotlib==3.7.0

@@ -8,7 +8,7 @@ from src.utils.pickleUtils import pdump, pload
 from src.proecssing import correct_count
 from transformers.models.bert.modeling_bert import SequenceClassifierOutput
 from src.classes.model import BertForCounterfactualRobustness
-from  src.classes.datasets import IMDBDataset
+from  src.classes.datasets import ClassificationDataset
 import pickle
 
 
@@ -27,9 +27,6 @@ def pretrainBERT(
   dataset_name: str,
   batch_size: int,
   epoch_num: int,
-  use_margin_loss: bool,
-  lambda_weight: float,
-  use_cache: bool,
   use_pinned_memory: bool
 ):
 
@@ -37,9 +34,8 @@ def pretrainBERT(
   DATASET_NAME = dataset_name
   BATCH_SIZE = batch_size
   EPOCH_NUM = epoch_num
-  USE_MARGIN_LOSS = use_margin_loss
-  LAMBDA_WEIGHT = lambda_weight
-  USE_ENCODING_CACHE = use_cache
+
+
   DATASET_PATH = f"datasets/{DATASET_NAME}/base"
   OUTPUT_PATH = f"checkpoints/{DATASET_NAME}/model"
   TOPK_NUM = 4
@@ -68,7 +64,7 @@ def pretrainBERT(
     train_encodings = tokenizer(train_texts, padding=True, truncation=True)
     pdump(train_encodings, os.path.join(DATASET_PATH, "train_encodings"))
     
-    train_dataset = IMDBDataset(labels=train_labels, encodings=train_encodings)
+    train_dataset = ClassificationDataset(labels=train_labels, encodings=train_encodings)
     train_loader = DataLoader(
       train_dataset,
       batch_size=BATCH_SIZE,
@@ -86,7 +82,7 @@ def pretrainBERT(
     valid_encodings = tokenizer(valid_texts, padding=True, truncation=True)
     pdump(valid_encodings, os.path.join(DATASET_PATH, "valid_encodings"))
 
-    valid_dataset = IMDBDataset(labels=valid_labels, encodings=valid_encodings)
+    valid_dataset = ClassificationDataset(labels=valid_labels, encodings=valid_encodings)
     valid_loader = DataLoader(
       valid_dataset,
       batch_size=BATCH_SIZE,
@@ -156,7 +152,7 @@ def pretrainBERT(
         token_type_ids = batch['token_type_ids'].to(device, dtype=torch.long)
         labels = batch['labels'].to(device)
         true_labels = labels #shape = [n_labels]
-        
+        _, labels = torch.max(labels, dim = 1)  
 
 
         outputs:SequenceClassifierOutput|tuple[torch.Tensor] = model.forward(
@@ -241,3 +237,10 @@ def pretrainBERT(
 
 
   pretrainModel()
+
+
+
+
+### Configuring misc. stuff
+from transformers import logging
+logging.set_verbosity_error()

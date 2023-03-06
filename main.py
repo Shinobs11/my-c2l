@@ -32,29 +32,29 @@ parser.add_argument(
 parser.add_argument(
   '--dataset-name',
   type=str,
-  required=True
 )
 parser.add_argument(
   '--batch-size',
   type=int,
-  required=True,
   default=16
 )
 parser.add_argument(
   '--epoch-num',
   type=int,
-  required=True,
   default=15
 )
-parser.add_argument(
-  '--use-margin-loss',
-  action='store_true'
-)
+
 parser.add_argument(
   '--lambda-weight',
   type=float,
   default=0.1
 )
+
+parser.add_argument(
+  '--use-cl-model',
+  action='store_true',
+)
+
 parser.add_argument(
   '--use-cache',
   action='store_true'
@@ -96,19 +96,12 @@ if args.pretrain == True:
     dataset_name=args.dataset_name,
     batch_size=args.batch_size,
     epoch_num=args.epoch_num,
-    use_margin_loss=args.use_margin_loss,
-    lambda_weight=args.lambda_weight,
-    use_cache=args.use_cache,
     use_pinned_memory=args.use_pinned_memory
   )
 if args.generate_triplets == True:
   generateTiplets(
     dataset_name=args.dataset_name,
     batch_size=args.batch_size,
-    epoch_num=args.epoch_num,
-    use_margin_loss=args.use_margin_loss,
-    lambda_weight=args.lambda_weight,
-    use_cache=args.use_cache,
     use_pinned_memory=args.use_pinned_memory
   )
 if args.constrastive_train == True:
@@ -116,16 +109,16 @@ if args.constrastive_train == True:
     dataset_name=args.dataset_name,
     batch_size=args.batch_size,
     epoch_num=args.epoch_num,
-    use_margin_loss=args.use_margin_loss,
-    lambda_weight=args.lambda_weight,
-    use_cache=args.use_cache
+    lambda_weight=args.lambda_weight
   )
 if args.evaluate == True:
   evaluateModel(
     dataset_name=args.dataset_name,
     batch_size=args.batch_size,
-    epoch_num=args.epoch_num,
-    use_margin_loss=args.use_margin_loss,
-    lambda_weight=args.lambda_weight,
-    use_cache=args.use_cache
+    use_cl_model=args.use_cl_model
   )
+
+
+
+
+

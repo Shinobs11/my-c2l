@@ -3,15 +3,15 @@ import json, os, pickle, torch, logging, typing, numpy as np, glob, argparse
 from torch.utils.data import DataLoader, Dataset
 from transformers import BertTokenizerFast, BertForSequenceClassification
 from transformers.models.bert.modeling_bert import SequenceClassifierOutput
-from src.classes.datasets import IMDBDataset
+from src.classes.datasets import ClassificationDataset
 from src.utils.pickleUtils import pdump, pload
 from src.proecssing import correct_count
 from torchmetrics import MetricCollection
 from torchmetrics.classification import MulticlassAccuracy
 from tqdm import tqdm
 import logging
-from src.logging.logSetup import logSetup
-
+from src.logging.logSetup import logSetup, mainLogger
+from src.classes.model import BertForCounterfactualRobustness
 log_path = os.path.join(os.path.split(str(__file__))[0], "logs", "eval")
 log_info_path = os.path.join(log_path, "eval_info.log")
 log_error_path = os.path.join(log_path, "eval_error.log")
@@ -29,25 +29,17 @@ info_logger = logSetup(
 def evaluateModel(
   dataset_name: str,
   batch_size: int,
-  epoch_num: int,
-  use_margin_loss: bool,
-  lambda_weight: float,
-  use_cache: bool
+  use_cl_model: bool = False
 ):
   device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
   DATASET_NAME = dataset_name
-  DATASET_PATH = f"datasets/{dataset_name}/base"
+  DATASET_PATH = f"datasets/{dataset_name}/augmented_triplets"
   BATCH_SIZE = batch_size
-  EPOCH_NUM = epoch_num
-  USE_MARGIN_LOSS = use_margin_loss
-  LAMBDA_WEIGHT = lambda_weight
-  USE_ENCODING_CACHE = use_cache
-  OUTPUT_PATH = f"checkpoints/{DATASET_NAME}/model"
-  TOPK_NUM = 4
-  # memAvailable = psutil.virtual_memory().available
-  # estimatedMemConsumed = os.path.getsize(os.path.join(DATASET_PATH, "train_set.pickle.blosc")) * 3
-  # USE_PINNED_MEMORY = True if (args.use_pinned_memory & (memAvailable > estimatedMemConsumed)) == 1 else False
 
+  if not use_cl_model:
+    MODEL_PATH = f"checkpoints/{DATASET_NAME}/model"
+  else:
+    MODEL_PATH = f"checkpoints/{DATASET_NAME}/augmented_model"
 
   def loadTestData():
     tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
@@ -56,7 +48,7 @@ def evaluateModel(
     test_labels = test_set['label'].tolist()
     test_encodings = tokenizer(test_texts, padding=True, truncation=True)
     pdump(test_encodings, os.path.join(DATASET_PATH, 'test_encodings'))
-    test_dataset = IMDBDataset(labels=test_labels, encodings=test_encodings)
+    test_dataset = ClassificationDataset(labels=test_labels, encodings=test_encodings)
     test_loader = DataLoader(
       test_dataset,
       batch_size=BATCH_SIZE,
@@ -77,7 +69,8 @@ def evaluateModel(
     exit()
 
   torch.cuda.empty_cache()
-  model: torch.nn.Module = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH, "best_epoch"), num_labels=num_labels) #type: ignore
+  model: torch.nn.Module = BertForCounterfactualRobustness.from_pretrained(os.path.join(MODEL_PATH, "best_epoch"), num_labels=num_labels) #type:ignore
+  # model: torch.nn.Module = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH, "best_epoch"), num_labels=num_labels) #type: ignore
   # model: BertForSequenceClassification = torch.nn.DataParallel(model) #type:ignore #!only use w/ distributed
   model.eval()
   model.to(device)
@@ -85,9 +78,9 @@ def evaluateModel(
 
 
 
-  metrics:MetricCollection = MetricCollection([
-    MulticlassAccuracy(num_classes=num_labels)
-  ]
+  metrics:MetricCollection = MetricCollection({
+    "accuracy": MulticlassAccuracy(num_classes=num_labels)
+  }
   ).to(device)
 
 
@@ -104,20 +97,24 @@ def evaluateModel(
 
 
       outputs = model.forward(
-        input_ids=input_ids,
-        attention_mask=attention_mask,
-        token_type_ids=token_type_ids
+        anchor_input_ids=input_ids,
+        anchor_attention_mask=attention_mask,
+        anchor_token_type_ids=token_type_ids
       )
 
       logits = outputs[0]
     
       _, true_labels_idx = torch.max(true_labels, dim = 1)
       _, pred_labels_idx = torch.max(logits, dim = 1)
-      info_logger.info(pred_labels_idx)
-      info_logger.info(true_labels_idx)
+      info_logger.info(f"pred_labels_idx: {pred_labels_idx}")
+      info_logger.info(f"true_labels_idx: {true_labels_idx}")
 
 
       metrics(preds=pred_labels_idx, target=true_labels_idx)
 
-  metrics(preds=torch.tensor([0, 1]).to(device), target=torch.tensor([1, 0]).to(device))
-  print(metrics.compute())
+  model_type = "cl" if use_cl_model else "base"
+  accuracy = metrics.compute()["accuracy"].item()
+
+  print(f"{model_type} model evaluation accuracy: {accuracy}")
+  info_logger.info(f"{model_type} model evaluation accuracy: {accuracy}")
+  mainLogger.info(f"{model_type} model evaluation accuracy: {accuracy}")
