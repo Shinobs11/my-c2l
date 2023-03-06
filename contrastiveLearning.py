@@ -44,7 +44,6 @@ def constrastiveTrain(
   DATASET_PATH = f"datasets/{DATASET_NAME}/augmented_triplets"
   OUTPUT_PATH = f"checkpoints/{DATASET_NAME}/augmented_model"
   EPOCH_NUM = epoch_num
-  TOPK_NUM = 4
   BATCH_SIZE = batch_size
 
 

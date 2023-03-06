@@ -5,7 +5,7 @@ Project for independent study
 ### Setup
 Currently I'm using Poetry to manage project dependencies. However, I've also included a requirements.txt file for setup with other package managers.
 
-Setup with Poetry 
+##### Setup with Poetry 
 ```
 git clone https://github.com/Shinobs11/my-c2l.git
 cd my-c2l
@@ -15,7 +15,7 @@ poetry shell
 (Poetry shell is needed whenever a new shell is created to add the virtual environment to the PATH env variable. VScode has support for automatically running scripts with the virtual environment. I'd imagine some other IDEs may have the same feature.)
 
 
-Setup with pip
+##### Setup with pip
 ```
 git clone https://github.com/Shinobs11/my-c2l.git
 cd my-c2l
@@ -72,7 +72,8 @@ Follow the scripts in the "dataset_splitting" folder to create your own script.
 
 
 
-### Future improvements
+
+
 
 
 ### Dataset

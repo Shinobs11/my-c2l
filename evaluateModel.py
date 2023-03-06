@@ -12,6 +12,7 @@ from tqdm import tqdm
 import logging
 from src.logging.logSetup import logSetup, mainLogger
 from src.classes.model import BertForCounterfactualRobustness
+
 log_path = os.path.join(os.path.split(str(__file__))[0], "logs", "eval")
 log_info_path = os.path.join(log_path, "eval_info.log")
 log_error_path = os.path.join(log_path, "eval_error.log")
@@ -70,8 +71,6 @@ def evaluateModel(
 
   torch.cuda.empty_cache()
   model: torch.nn.Module = BertForCounterfactualRobustness.from_pretrained(os.path.join(MODEL_PATH, "best_epoch"), num_labels=num_labels) #type:ignore
-  # model: torch.nn.Module = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH, "best_epoch"), num_labels=num_labels) #type: ignore
-  # model: BertForSequenceClassification = torch.nn.DataParallel(model) #type:ignore #!only use w/ distributed
   model.eval()
   model.to(device)
 

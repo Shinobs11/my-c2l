@@ -38,7 +38,7 @@ def pretrainBERT(
 
   DATASET_PATH = f"datasets/{DATASET_NAME}/base"
   OUTPUT_PATH = f"checkpoints/{DATASET_NAME}/model"
-  TOPK_NUM = 4
+
 
 
 
