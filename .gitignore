@@ -1,0 +1,23 @@
+checkpoints
+logs
+profiles
+cache
+__pycache__
+
+datasets/fake_jobs_1
+datasets/fake_news_1
+datasets/amazon
+# datasets/yelp_chi
+datasets/yelp_chi/augmented_triplets
+datasets/yelp_nyc
+datasets/yelp_zip
+
+*.pickle.blosc
+*.pickle
+*.bin
+*.pyc
+
+
+
+
+torchPlayground.ipynb
