@@ -18,7 +18,7 @@ class ClassificationDataset(Dataset):
     self.enumerate = enumerate
   def __getitem__(self, idx):
     item = {
-      'labels': torch.tensor(self.labels[idx]),
+      'label': torch.tensor(self.labels[idx]),
     }
     item.update({k: torch.tensor(v[idx]) for k, v in self.encodings.items()})
 
@@ -69,8 +69,8 @@ class CFClassifcationDataset(Dataset):
         item.update({'anchor_'+key: torch.tensor(val[idx]) for key, val in self.anchor_encodings.items()})
         item.update({'positive_'+key: torch.tensor(val[idx]) for key, val in self.positive_encodings.items()})
         item.update({'negative_'+key: torch.tensor(val[idx]) for key, val in self.negative_encodings.items()})
-        item['triplet_sample_masks'] = torch.tensor(self.triplet_sample_masks[idx])
-        item['labels'] = torch.tensor(self.labels[idx])
+        item['triplet_sample_mask'] = torch.tensor(self.triplet_sample_masks[idx])
+        item['label'] = torch.tensor(self.labels[idx])
         if (self.enumerate == True):
           return idx, item
         else:

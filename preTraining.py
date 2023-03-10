@@ -2,7 +2,7 @@ import json, os, pickle, torch, logging, typing, numpy as np, glob, argparse
 from torch.utils.data import DataLoader, Dataset
 from pathlib import Path
 from tqdm import tqdm
-from transformers import BertTokenizerFast, BertForSequenceClassification, get_linear_schedule_with_warmup
+from transformers import BertTokenizerFast, BertForSequenceClassification, get_linear_schedule_with_warmup, get_constant_schedule_with_warmup
 
 from src.utils.pickleUtils import pdump, pload
 from src.proecssing import correct_count
@@ -16,9 +16,8 @@ import json, psutil
 
 from torchmetrics import MetricCollection
 from torchmetrics.classification import MulticlassAccuracy
-
-
-
+import wandb
+torch.manual_seed(0)
 
 
 
@@ -55,7 +54,7 @@ def pretrainBERT(
 
 
     tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
-    train_set = pload(os.path.join(DATASET_PATH, "train_set"))
+    train_set = pload(os.path.join(DATASET_PATH, "train_set"))[0:10]
     train_labels:list = train_set['label'].tolist()
     train_texts:list[str] = train_set['text'].tolist()
     
@@ -68,7 +67,7 @@ def pretrainBERT(
     train_loader = DataLoader(
       train_dataset,
       batch_size=BATCH_SIZE,
-      shuffle=True, #TODOS: test impact of shuffle
+      shuffle=False, #TODOS: test impact of shuffle
       pin_memory=use_pinned_memory
       )
     return train_loader
@@ -76,7 +75,7 @@ def pretrainBERT(
   def loadValData():
     tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
 
-    valid_set = pload(os.path.join(DATASET_PATH, "valid_set"))
+    valid_set = pload(os.path.join(DATASET_PATH, "valid_set"))[0:10]
     valid_texts:list[str] = valid_set['text'].tolist()
     valid_labels: list = valid_set['label'].tolist()
     valid_encodings = tokenizer(valid_texts, padding=True, truncation=True)
@@ -86,7 +85,7 @@ def pretrainBERT(
     valid_loader = DataLoader(
       valid_dataset,
       batch_size=BATCH_SIZE,
-      shuffle=True,
+      shuffle=False,
       pin_memory=use_pinned_memory
     )
 
@@ -111,8 +110,8 @@ def pretrainBERT(
     
 
     num_classes = -1
-    if len(train_loader.dataset[0]["labels"].shape) == 1:
-      num_classes = train_loader.dataset[0]["labels"].shape[0]
+    if len(train_loader.dataset[0]["label"].shape) == 1:
+      num_classes = train_loader.dataset[0]["label"].shape[0]
     else:
       s = set()
       [s.add(x["labels"]) for x in train_loader.dataset]
@@ -129,8 +128,9 @@ def pretrainBERT(
     model.to(device)
 
     optim = torch.optim.AdamW(model.parameters(), lr=5e-5)
-    scheduler = get_linear_schedule_with_warmup(optim, num_warmup_steps=50, num_training_steps=len(train_loader)*EPOCH_NUM)
-
+    # scheduler = get_linear_schedule_with_warmup(optim, num_warmup_steps=50, num_training_steps=len(train_loader)*EPOCH_NUM)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode='min', factor=0.5, patience=3, verbose=True)
+    warmup = get_constant_schedule_with_warmup(optim, num_warmup_steps=int(len(train_loader)*0.10))
     steps = 0
     best_acc = 0
     best_epoch = -1
@@ -150,7 +150,7 @@ def pretrainBERT(
         input_ids = batch['input_ids'].to(device, dtype=torch.long)
         attention_mask = batch['attention_mask'].to(device, dtype=torch.long)
         token_type_ids = batch['token_type_ids'].to(device, dtype=torch.long)
-        labels = batch['labels'].to(device)
+        labels = batch['label'].to(device)
         true_labels = labels #shape = [n_labels]
         _, labels = torch.max(labels, dim = 1)  
 
@@ -180,7 +180,8 @@ def pretrainBERT(
         # epoch_loss.append(loss.sum())
         train_progress_bar.set_description("Epoch train_accuracy %f" % train_metrics.compute().item())
         optim.step()
-        scheduler.step()
+        warmup.step()
+        # scheduler.step()
         steps+=1
 
       # all_loss.append(epoch_loss)
@@ -189,32 +190,38 @@ def pretrainBERT(
 
 
       accuracy = 0.0
-
+      val_loss = 0.0
       for batch in valid_loader:
         with torch.no_grad():
-            input_ids = batch['input_ids'].to(device, dtype=torch.long)
-            attention_mask = batch['attention_mask'].to(device, dtype=torch.long)
-            token_type_ids = batch['token_type_ids'].to(device, dtype=torch.long)
-            true_labels = batch['labels'].to(device)
-            outputs:SequenceClassifierOutput|tuple[torch.Tensor] = model.forward(
-              anchor_input_ids=input_ids,
-              anchor_attention_mask=attention_mask,
-              anchor_token_type_ids=token_type_ids,
-              return_dict=True
-            )
-            assert isinstance(outputs, SequenceClassifierOutput)
-            logits = outputs['logits']
-            _, pred_labels_idx = logits.max(dim=1)
-            _, true_labels_idx = true_labels.max(dim=1)
-            # print("Preds:",pred_labels_idx)
-            # print("Trues:",true_labels_idx)
-            valid_metrics.update(pred_labels_idx, true_labels_idx)
+          # labels = batch['label'].to(device)
+          input_ids = batch['input_ids'].to(device, dtype=torch.long)
+          attention_mask = batch['attention_mask'].to(device, dtype=torch.long)
+          token_type_ids = batch['token_type_ids'].to(device, dtype=torch.long)
+          true_labels = batch['label'].to(device)
+          outputs:SequenceClassifierOutput|tuple[torch.Tensor] = model.forward(
+            labels=true_labels,
+            anchor_input_ids=input_ids,
+            anchor_attention_mask=attention_mask,
+            anchor_token_type_ids=token_type_ids,
+            return_dict=True
+          )
+          assert isinstance(outputs, SequenceClassifierOutput)
+          loss = outputs['loss']
+          logits = outputs['logits']
+          val_loss += loss.sum()
+          _, pred_labels_idx = logits.max(dim=1)
+          _, true_labels_idx = true_labels.max(dim=1)
+          # print("Preds:",pred_labels_idx)
+          # print("Trues:",true_labels_idx)
+          valid_metrics.update(pred_labels_idx, true_labels_idx)
   
         accuracy = valid_metrics.compute().item()
       if accuracy >= best_acc:
         best_epoch = epoch
         best_acc = accuracy
       print(f"Accuracy: {accuracy}")
+      scheduler.step(val_loss)
+      wandb.log({"accuracy": accuracy, "valid_loss": val_loss})
       model.save_pretrained(os.path.join(OUTPUT_PATH, f"epoch_{epoch}")) #type:ignore
     pdump(all_loss, os.path.join(OUTPUT_PATH,"training_loss"))
     print(f"\nBest model is epoch {best_epoch}.")

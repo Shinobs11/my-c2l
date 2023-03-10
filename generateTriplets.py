@@ -14,8 +14,11 @@ from torch import Tensor
 import torch.linalg as lin
 import functorch
 
-
-
+torch.manual_seed(0)
+import numpy as np
+np.random.seed(0)
+import random
+random.seed(0)
 
 
 
@@ -24,8 +27,12 @@ import functorch
 
 def generateTiplets(
   dataset_name: str,
-  batch_size: int,
-  use_pinned_memory: bool
+  use_pinned_memory: bool,
+  topk_num: int = 4,
+  dropout_ratio: float = 0.5,
+  max_masking_attempts: int = 0,
+  sampling_ratio: int = 1,
+  augment_ratio: int = 1
 ):
   batch_size = 1
   DATASET_NAME = dataset_name
@@ -34,14 +41,14 @@ def generateTiplets(
   TRIPLETS_PATH = f"datasets/{DATASET_NAME}/augmented_triplets"
   
   #! convert these into arguments
-  TOPK_NUM = 4
-  DROPOUT_RATIO = 0.5
-  MAX_MASKING_ATTEMPTS = 10
+  TOPK_NUM = topk_num
+  DROPOUT_RATIO = dropout_ratio
+  MAX_MASKING_ATTEMPTS = max_masking_attempts
 
   import json
 
 
-  sampling_ratio = 1
+  
 
   tokenizer: T.BertTokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
   
@@ -51,8 +58,8 @@ def generateTiplets(
 
   train_set = pload(os.path.join(DATASET_PATH, "train_set"))
 
-  train_texts = train_set["text"].tolist()
-  train_labels = train_set["label"].tolist()
+  train_texts = train_set["text"].tolist()[0:10]
+  train_labels = train_set["label"].tolist()[0:10]
 
 
 
@@ -68,8 +75,8 @@ def generateTiplets(
     )
   
   num_classes = -1
-  if len(train_loader.dataset[0]["labels"].shape) == 1:
-    num_classes = train_loader.dataset[0]["labels"].shape[0]
+  if len(train_loader.dataset[0]["label"].shape) == 1:
+    num_classes = train_loader.dataset[0]["label"].shape[0]
   else:
     print("Invalid label shape")
     exit()
@@ -78,8 +85,6 @@ def generateTiplets(
 
 
 
-
-  importance_testing = open("./importance_testing", mode = 'w')
 
 
 
@@ -90,7 +95,7 @@ def generateTiplets(
     def get_gradient_norms(batch):
       input_ids:Tensor = batch['input_ids'].to(device)
       attention_mask:Tensor = batch['attention_mask'].to(device)
-      labels:Tensor = batch['labels'].to(device)
+      labels:Tensor = batch['label'].to(device)
       labels = torch.argmax(labels, dim=1)
       token_len = input_ids.shape[1]
       importances = []
@@ -200,7 +205,7 @@ def generateTiplets(
       
       orig_sample = tokenizer.decode(tokens,  clean_up_tokenization_spaces=True)
       # print(orig_sample)
-      causal_mask, err_flag, maximum_score = mask_causal_words(tokens, batch, importances[0], topk=sampling_ratio)
+      causal_mask, err_flag, maximum_score = mask_causal_words(tokens, batch, importances[0])
       # exit()
       no_flip_index.append(err_flag)
       if err_flag:
@@ -236,8 +241,8 @@ def generateTiplets(
         else:
           pass
 
-        causal_masked_sample = tokenizer.decode(causal_masked_tokens,  clean_up_tokenization_spaces=True)
-        noncausal_masked_sample = tokenizer.decode(noncausal_masked_tokens, clean_up_tokenization_spaces=True)
+        causal_masked_sample = tokenizer.decode(causal_masked_tokens)
+        noncausal_masked_sample = tokenizer.decode(noncausal_masked_tokens)
 
         # _, labels = torch.max(batch['labels'], dim=1)
     
@@ -258,12 +263,12 @@ def generateTiplets(
   model:BertForSequenceClassification = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH, 'best_epoch')) #type:ignore
   model.to(device)
   model.eval()
-  def mask_causal_words(tokens:Tensor, batch:DataItem, importances: Tensor, topk=1):
+  def mask_causal_words(tokens:Tensor, batch:DataItem, importances: Tensor):
     
 
     
-    masking_attempts_allowed = len(tokens) if len(tokens)<=MAX_MASKING_ATTEMPTS else MAX_MASKING_ATTEMPTS
-    
+    masking_attempts_allowed = len(tokens) if (len(tokens)<=MAX_MASKING_ATTEMPTS) or (MAX_MASKING_ATTEMPTS==0) else MAX_MASKING_ATTEMPTS
+
     
     importances = importances[0:len(tokens)]
     dropout = torch.nn.Dropout(DROPOUT_RATIO)
@@ -383,14 +388,13 @@ def generateTiplets(
 
 
 
-  sampling_ratio = 1
-  augment_ratio = 1
+
 
   triplets_train, no_flip_idx_train = mask_data(train_loader, average_importance, sampling_ratio=sampling_ratio, augment_ratio=augment_ratio)
 
   triplets_json:list[dict] = []
   triplets_pickle:dict[str,list] = {
-    "labels": [],
+    "label": [],
     "anchor_texts": [],
     "positive_texts": [],
     "negative_texts": [],
@@ -399,14 +403,15 @@ def generateTiplets(
   for x in triplets_train:
     triplets_json.append(
       {
-        "label": x[0],
+        "label": x[0].tolist(),
         "anchor_text": x[1],
         "positive_text": x[3],
         "negative_text": x[2],
         "triplet_sample_mask": x[4]
       }
     )
-    triplets_pickle["labels"].append(x[0])
+
+    triplets_pickle["label"].append(x[0])
     triplets_pickle["anchor_texts"].append(x[1])
     triplets_pickle["positive_texts"].append(x[3])
     triplets_pickle["negative_texts"].append(x[2])

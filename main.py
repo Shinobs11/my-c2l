@@ -3,6 +3,13 @@ from preTraining import pretrainBERT
 from generateTriplets import generateTiplets
 from contrastiveLearning import constrastiveTrain
 from evaluateModel import evaluateModel
+
+torch.manual_seed(0)
+import numpy as np
+np.random.seed(0)
+import random
+random.seed(0)
+
 parser = argparse.ArgumentParser(
   usage="python3 main.py [options...]",
   description="Implementation of Causally Contrastive Learning for Robust Text Classification from https://ojs.aaai.org/index.php/AAAI/article/download/21296/version/19583/21045 "
@@ -49,6 +56,32 @@ parser.add_argument(
   type=float,
   default=0.1
 )
+#triplets args
+parser.add_argument(
+  '--max-masking-attempts',
+  type=int,
+  default=0
+)
+parser.add_argument(
+  '--sampling-ratio',
+  type=int,
+  default=1
+)
+parser.add_argument(
+  '--augment-ratio',
+  type=int,
+  default=1
+)
+parser.add_argument(
+  '--topk-num',
+  type=int,
+  default=4
+)
+parser.add_argument(
+  '--dropout-ratio',
+  type=float,
+  default=0.5
+)
 
 parser.add_argument(
   '--use-cl-model',
@@ -91,6 +124,10 @@ if args.clear_models == True:
 if args.clear_base_models == True:
   shutil.rmtree("~/.cache/huggingface/hub/models--bert-base-uncased")
 
+
+
+
+
 if args.pretrain == True:
   pretrainBERT(
     dataset_name=args.dataset_name,
@@ -101,8 +138,12 @@ if args.pretrain == True:
 if args.generate_triplets == True:
   generateTiplets(
     dataset_name=args.dataset_name,
-    batch_size=args.batch_size,
-    use_pinned_memory=args.use_pinned_memory
+    use_pinned_memory=args.use_pinned_memory,
+    max_masking_attempts=args.max_masking_attempts,
+    topk_num=args.topk_num,
+    sampling_ratio=args.sampling_ratio,
+    augment_ratio=args.augment_ratio,
+    dropout_ratio=args.dropout_ratio
   )
 if args.constrastive_train == True:
   constrastiveTrain(

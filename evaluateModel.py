@@ -13,6 +13,15 @@ import logging
 from src.logging.logSetup import logSetup, mainLogger
 from src.classes.model import BertForCounterfactualRobustness
 
+
+torch.manual_seed(0)
+import numpy as np
+np.random.seed(0)
+import random
+random.seed(0)
+
+
+
 log_path = os.path.join(os.path.split(str(__file__))[0], "logs", "eval")
 log_info_path = os.path.join(log_path, "eval_info.log")
 log_error_path = os.path.join(log_path, "eval_error.log")
@@ -53,7 +62,7 @@ def evaluateModel(
     test_loader = DataLoader(
       test_dataset,
       batch_size=BATCH_SIZE,
-      shuffle=True,
+      shuffle=False,
       persistent_workers=False,
       pin_memory=False
     )
@@ -63,8 +72,8 @@ def evaluateModel(
 
   test_loader: DataLoader = loadTestData()
   num_labels = -1
-  if len(test_loader.dataset[0]["labels"].shape) == 1:
-    num_labels = test_loader.dataset[0]["labels"].shape[0]
+  if len(test_loader.dataset[0]['label'].shape) == 1:
+    num_labels = test_loader.dataset[0]['label'].shape[0]
   else:
     print("Invalid label shape")
     exit()
@@ -90,7 +99,7 @@ def evaluateModel(
       input_ids = batch["input_ids"].to(device)
       attention_mask = batch["attention_mask"].to(device)
       token_type_ids = batch["token_type_ids"].to(device)
-      true_labels =  batch["labels"].to(device)
+      true_labels =  batch['label'].to(device)
 
 
 

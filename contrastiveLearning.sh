@@ -1,6 +1,6 @@
 #!/bin/bash
-# DATASET=original_augmented_1x_aclImdb
-DATASET=yelp_chi
+DATASET=original_augmented_1x_aclImdb
+# DATASET=yelp_chi
 echo "Starting contrastive learning script..."
 for i in "0"
 do

@@ -1,9 +1,9 @@
-import json, os, pickle, torch, logging, typing, numpy as np, glob, argparse
+import json, os, pickle, torch, logging, typing, numpy as np, glob, argparse, wandb
 from re import L
 from torch.utils.data import DataLoader, Dataset
 from pathlib import Path
 from tqdm import tqdm
-from transformers import BertTokenizerFast, BertForMaskedLM, BertForSequenceClassification, get_linear_schedule_with_warmup
+from transformers import BertTokenizerFast, BertForMaskedLM, BertForSequenceClassification, get_linear_schedule_with_warmup, get_constant_schedule_with_warmup
 import transformers as T
 from logging.handlers import RotatingFileHandler
 from src.logging.logSetup import mainLogger
@@ -20,7 +20,13 @@ from torchmetrics.classification import MulticlassAccuracy
 
 
 
-import json
+torch.manual_seed(0)
+import numpy as np
+np.random.seed(0)
+import random
+random.seed(0)
+
+
 
 handler = RotatingFileHandler(
     "logs/contrastiveLearning.log",
@@ -52,8 +58,8 @@ def constrastiveTrain(
 
 
 
-  train_set:pd.DataFrame = pload(os.path.join(DATASET_PATH, 'train_set'))
-  valid_set:pd.DataFrame = pload(os.path.join(DATASET_PATH, 'valid_set'))
+  train_set:pd.DataFrame = pload(os.path.join(DATASET_PATH, 'train_set'))[0:10]
+  valid_set:pd.DataFrame = pload(os.path.join(DATASET_PATH, 'valid_set'))[0:10]
 
 
   train_labels = train_set['label'].to_list()
@@ -86,12 +92,12 @@ def constrastiveTrain(
   train_dataset = CFClassifcationDataset(anchor_train_encodings, positive_train_encodings, negative_train_encodings, train_triplet_sample_masks, train_labels)
   valid_dataset = ClassificationDataset(anchor_valid_encodings, valid_labels)
 
-  train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+  train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False)
   valid_loader = DataLoader(valid_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
   num_classes = -1
-  if len(train_loader.dataset[0]["labels"].shape) == 1:
-    num_classes = train_loader.dataset[0]["labels"].shape[0]
+  if len(train_loader.dataset[0]['label'].shape) == 1:
+    num_classes = train_loader.dataset[0]['label'].shape[0]
   else:
     print("Invalid label shape")
     exit()
@@ -101,8 +107,8 @@ def constrastiveTrain(
   model:BertForCounterfactualRobustness = BertForCounterfactualRobustness.from_pretrained('bert-base-uncased', num_labels=num_classes) #type:ignore
   model.to(device)
   optim = torch.optim.AdamW(model.parameters(), lr=5e-5)
-  scheduler = get_linear_schedule_with_warmup(optim, num_warmup_steps=50, num_training_steps=len(train_loader) * EPOCH_NUM)
-
+  warmup = get_constant_schedule_with_warmup(optim, num_warmup_steps=int(len(train_loader)*0.10))
+  scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode='min', factor=0.5, patience=3, verbose=True)
   best_epoch = -1
   best_acc = 0
   steps = 0
@@ -128,13 +134,13 @@ def constrastiveTrain(
       negative_attention_mask= batch['negative_attention_mask'].to(device, dtype=torch.long)
       negative_token_type_ids = batch['negative_token_type_ids'].to(device, dtype=torch.long)
       
-      triplet_sample_masks = batch['triplet_sample_masks'].to(device)
+      triplet_sample_masks = batch['triplet_sample_mask'].to(device)
 
-      labels = batch['labels'].to(device, dtype=torch.float) 
+      labels = batch['label'].to(device, dtype=torch.float) 
 
 
       true_labels = labels
-      _, labels = torch.max(labels, dim = 1) 
+      # _, labels = torch.max(labels, dim = 1) 
 
 
    
@@ -165,35 +171,40 @@ def constrastiveTrain(
 
       train_progress_bar.set_description("Epoch train accuracy: %f" % train_metrics.compute().item())
       optim.step()
-      scheduler.step()
+      warmup.step()
+      # scheduler.step()
       steps += 1
 
     # print(f"Total Train Accuracy: {total_train_accuracy}")
 
     model.eval()
     accuracy = 0.0
+    val_loss = 0.0
     for batch in valid_loader:
         with torch.no_grad():
             input_ids = batch['input_ids'].to(device)
             attention_mask = batch['attention_mask'].to(device)
             token_type_ids = batch['token_type_ids'].to(device)
-            true_labels = batch['labels'].to(device)
+            true_labels = batch['label'].to(device)
             outputs = model(
+                    labels=true_labels,
                     anchor_input_ids = input_ids,
                     anchor_attention_mask = attention_mask,
                     anchor_token_type_ids = token_type_ids
                     )
-
-            logits = outputs[0]
+            loss = outputs[0]
+            logits = outputs[1]
+            val_loss += loss.sum()
             _, pred_labels_idx = logits.max(dim=1)
             _, true_labels_idx = true_labels.max(dim=1)
 
             log.debug(f"pred_labels_idx: {pred_labels_idx} true_labels_idx: {true_labels_idx}\n")
 
             valid_metrics.update(pred_labels_idx, true_labels_idx)
-
+    scheduler.step(val_loss)
     accuracy = valid_metrics.compute().item()
     log.debug(f"Validation accuracy for epoch {epoch}: {accuracy}")
+    wandb.log({"accuracy": accuracy, "valid_loss": val_loss})
     if accuracy >= best_acc:
         best_epoch = epoch
         best_acc = accuracy
