@@ -1,4 +1,4 @@
-import json, os, pickle, torch, logging, typing, numpy as np, pandas as pd
+import json, os, pickle, torch, logging, typing, numpy as np, pandas as pd, wandb
 from torch.utils.data import DataLoader, Dataset
 from pathlib import Path
 from tqdm import tqdm
@@ -13,13 +13,13 @@ from src.classes.datasets import DataItem, ClassificationDataset, TripletGenData
 from torch import Tensor
 import torch.linalg as lin
 import functorch
-
+import typing
 torch.manual_seed(0)
 import numpy as np
 np.random.seed(0)
 import random
 random.seed(0)
-
+from typing import Tuple, Union, List
 
 
 
@@ -86,9 +86,9 @@ def generateTiplets(
 
 
 
+  
 
-
-  def compute_importances(data_loader:DataLoader) -> list[Tensor]:
+  def compute_importances(data_loader:DataLoader) -> List[Tensor]:
     model:BertForSequenceClassification = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH, 'best_epoch'), output_hidden_states=True, num_labels=num_classes) #type:ignore
     model.to(device)
 
@@ -102,7 +102,7 @@ def generateTiplets(
       for i in range(input_ids.shape[0]):
 
 
-        outputs:SequenceClassifierOutput | tuple[Tensor] = model.forward(input_ids=input_ids[i].unsqueeze(dim=0), attention_mask=attention_mask[i].unsqueeze(dim=0), labels=labels[i].unsqueeze(dim=0), return_dict=True)
+        outputs: Union[SequenceClassifierOutput, Tuple[Tensor]] = model.forward(input_ids=input_ids[i].unsqueeze(dim=0), attention_mask=attention_mask[i].unsqueeze(dim=0), labels=labels[i].unsqueeze(dim=0), return_dict=True)
         assert isinstance(outputs, SequenceClassifierOutput)
 
         loss = outputs['loss']
@@ -133,7 +133,7 @@ def generateTiplets(
       all_importances.append(importances)
     return all_importances
 
-  def compute_average_importance(data_loader:DataLoader, all_importances) -> list[Tensor]:
+  def compute_average_importance(data_loader:DataLoader, all_importances) -> typing.List[Tensor]:
     importance_sum = torch.zeros((VOCAB_SIZE,), dtype=torch.float64).to(device)
     importance_count = torch.zeros((VOCAB_SIZE,), dtype=torch.int32).to(device)
     total_count = 0
@@ -187,7 +187,7 @@ def generateTiplets(
   mlm_model: BertForMaskedLM = mlm_model.to(device) #type: ignore
   mlm_model.eval()
 
-  def mask_data(data_loader:DataLoader, all_importances: list[Tensor], sampling_ratio, augment_ratio):
+  def mask_data(data_loader:DataLoader, all_importances: typing.List[Tensor], sampling_ratio, augment_ratio):
     triplets = []
     error_count = 0
     no_flip_count = 0
@@ -249,7 +249,9 @@ def generateTiplets(
 
         triplets.append((batch['label'], orig_sample, causal_masked_sample, noncausal_masked_sample, err_flag, maximum_score))
     print(f"Error count: {error_count}")
-    print(f"No flip count: {no_flip_count}")
+    print(f"Flip count: {len(data_loader) - no_flip_count}")
+
+    wandb.log({"flip count": (len(data_loader) - no_flip_count), "percentage flipped": (len(data_loader) - no_flip_count)/len(data_loader) * 100})
 
       
     return triplets, no_flip_index
@@ -392,7 +394,7 @@ def generateTiplets(
 
   triplets_train, no_flip_idx_train = mask_data(train_loader, average_importance, sampling_ratio=sampling_ratio, augment_ratio=augment_ratio)
 
-  triplets_json:list[dict] = []
+  triplets_json:List[dict] = []
   triplets_pickle:dict[str,list] = {
     "label": [],
     "anchor_texts": [],

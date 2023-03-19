@@ -1,5 +1,5 @@
 from ast import Mult
-import json, os, pickle, torch, logging, typing, numpy as np, glob, argparse
+import json, os, pickle, torch, logging, typing, numpy as np, glob, argparse, wandb
 from torch.utils.data import DataLoader, Dataset
 from transformers import BertTokenizerFast, BertForSequenceClassification
 from transformers.models.bert.modeling_bert import SequenceClassifierOutput
@@ -117,12 +117,13 @@ def evaluateModel(
       info_logger.info(f"pred_labels_idx: {pred_labels_idx}")
       info_logger.info(f"true_labels_idx: {true_labels_idx}")
 
+      
 
       metrics(preds=pred_labels_idx, target=true_labels_idx)
 
   model_type = "cl" if use_cl_model else "base"
   accuracy = metrics.compute()["accuracy"].item()
+  wandb.log({"eval accuracy": accuracy})
 
-  print(f"{model_type} model evaluation accuracy: {accuracy}")
   info_logger.info(f"{model_type} model evaluation accuracy: {accuracy}")
   mainLogger.info(f"{model_type} model evaluation accuracy: {accuracy}")

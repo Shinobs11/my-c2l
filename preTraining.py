@@ -221,7 +221,7 @@ def pretrainBERT(
         best_acc = accuracy
       print(f"Accuracy: {accuracy}")
       scheduler.step(val_loss)
-      wandb.log({"accuracy": accuracy, "valid_loss": val_loss})
+      wandb.log({"valid accuracy": accuracy, "valid loss": val_loss})
       model.save_pretrained(os.path.join(OUTPUT_PATH, f"epoch_{epoch}")) #type:ignore
     pdump(all_loss, os.path.join(OUTPUT_PATH,"training_loss"))
     print(f"\nBest model is epoch {best_epoch}.")

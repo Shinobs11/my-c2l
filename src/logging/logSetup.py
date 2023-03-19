@@ -2,14 +2,14 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 import typing
-
+from typing import Union
 
 cwd = os.path.split(__file__)[0]
 def logSetup(
   logger_name: str,
   logger_path: str,
-  level: str |int,
-  format: str | None,
+  level: Union[str, int],
+  format: Union[str, None],
    ):
   if format == None:
     format = "[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s"

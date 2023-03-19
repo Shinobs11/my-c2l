@@ -7,7 +7,7 @@
 DATASET=original_augmented_1x_aclImdb
 # DATASET=yelp_chi
 
-python3 main.py \
+PJRT_DEVICE=GPU python3 main.py \
 --generate-triplets \
 --dataset-name $DATASET \
 --use-pinned-memory \

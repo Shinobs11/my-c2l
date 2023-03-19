@@ -1,5 +1,4 @@
-import json, os, pickle, torch, logging, typing, numpy as np, glob, argparse, wandb
-from re import L
+import json, os, pickle, torch, logging, typing, numpy as np, glob, argparse, wandb, torch_xla
 from torch.utils.data import DataLoader, Dataset
 from pathlib import Path
 from tqdm import tqdm
@@ -17,6 +16,9 @@ from src.classes.model import BertForCounterfactualRobustness
 
 
 from torchmetrics.classification import MulticlassAccuracy
+
+
+import torch_xla.core.xla_model as xm
 
 
 
@@ -38,6 +40,22 @@ log.setLevel(logging.DEBUG)
 log.addHandler(handler)
 
 
+wandb.init(
+   
+   
+   
+  )
+
+
+
+
+
+
+
+
+
+# device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+device = torch.device('cuda') if torch.cuda.is_available() else xm.xla_device()
 
 def constrastiveTrain(
   dataset_name: str,
@@ -103,7 +121,8 @@ def constrastiveTrain(
     exit()
 
 
-  device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
+
   model:BertForCounterfactualRobustness = BertForCounterfactualRobustness.from_pretrained('bert-base-uncased', num_labels=num_classes) #type:ignore
   model.to(device)
   optim = torch.optim.AdamW(model.parameters(), lr=5e-5)
@@ -204,7 +223,7 @@ def constrastiveTrain(
     scheduler.step(val_loss)
     accuracy = valid_metrics.compute().item()
     log.debug(f"Validation accuracy for epoch {epoch}: {accuracy}")
-    wandb.log({"accuracy": accuracy, "valid_loss": val_loss})
+    wandb.log({"valid accuracy": accuracy, "valid loss": val_loss})
     if accuracy >= best_acc:
         best_epoch = epoch
         best_acc = accuracy
