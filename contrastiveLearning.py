@@ -76,8 +76,8 @@ def constrastiveTrain(
 
 
 
-  train_set:pd.DataFrame = pload(os.path.join(DATASET_PATH, 'train_set'))[0:10]
-  valid_set:pd.DataFrame = pload(os.path.join(DATASET_PATH, 'valid_set'))[0:10]
+  train_set:pd.DataFrame = pload(os.path.join(DATASET_PATH, 'train_set'))
+  valid_set:pd.DataFrame = pload(os.path.join(DATASET_PATH, 'valid_set'))
 
 
   train_labels = train_set['label'].to_list()

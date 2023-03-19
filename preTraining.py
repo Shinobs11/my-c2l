@@ -54,7 +54,7 @@ def pretrainBERT(
 
 
     tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
-    train_set = pload(os.path.join(DATASET_PATH, "train_set"))[0:10]
+    train_set = pload(os.path.join(DATASET_PATH, "train_set"))
     train_labels:list = train_set['label'].tolist()
     train_texts:list[str] = train_set['text'].tolist()
     

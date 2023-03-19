@@ -58,8 +58,8 @@ def generateTiplets(
 
   train_set = pload(os.path.join(DATASET_PATH, "train_set"))
 
-  train_texts = train_set["text"].tolist()[0:10]
-  train_labels = train_set["label"].tolist()[0:10]
+  train_texts = train_set["text"].tolist()
+  train_labels = train_set["label"].tolist()
 
 
 
