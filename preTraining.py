@@ -36,12 +36,19 @@ torch.manual_seed(0)
 
 
 
+
+
 def pretrainBERT(
   dataset_name: str,
   batch_size: int,
   epoch_num: int,
   use_pinned_memory: bool
 ):
+
+  if pjrt.using_pjrt():
+    print("pjrt: enabled")
+  else:
+    print("pjrt: disabled")
 
 
   DATASET_NAME = dataset_name
@@ -92,7 +99,7 @@ def pretrainBERT(
     print(f"Started process on index {index}")
     def pretrainModel():
       #acquire tpu device
-      device = xm.xla_device(index)
+      device = xm.xla_device()
       #initialize distributed package with url
       dist.init_process_group('xla', init_method='pjrt://')
 
@@ -104,7 +111,7 @@ def pretrainBERT(
       train_dataset  = loadTrainData()
       valid_dataset = loadValData()
 
-      if xm.pjrt.world_size() > 1:
+      if xm.xrt_world_size() > 1:
         train_sampler = DistributedSampler(
             train_dataset,
             num_replicas=xm.xrt_world_size(),
@@ -161,7 +168,7 @@ def pretrainBERT(
         pjrt.broadcast_master_param(model)
 
 
-      model = DDP(model, gradient_as_bucket_view=True) #TODOS: Figure out if DDP is useful here
+      model = DDP(model) #TODOS: Figure out if DDP is useful here
       model.to(device)
 
       optim = torch.optim.AdamW(model.parameters(), lr=5e-5)
@@ -172,7 +179,7 @@ def pretrainBERT(
       best_acc = 0
       best_epoch = -1
       all_loss = []
-
+      exit()
 
 
       for epoch in range(EPOCH_NUM):
