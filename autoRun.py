@@ -17,13 +17,13 @@ import wandb
 import wandb.util as wbutil
 import random
 
-if torch.cuda.is_available():
-  os.environ['PJRT_DEVICE'] = 'GPU'
-elif xm.get_xla_supported_devices('TPU') is not None:
-  os.environ['PJRT_DEVICE'] = 'TPU'
-else:
-  os.environ['PJRT_DEVICE'] = 'CPU'
-
+# if torch.cuda.is_available():
+#   os.environ['PJRT_DEVICE'] = 'GPU'
+# elif xm.get_xla_supported_devices('TPU') is not None:
+#   os.environ['PJRT_DEVICE'] = 'TPU'
+# else:
+#   os.environ['PJRT_DEVICE'] = 'CPU'
+os.environ['PJRT_DEVICE'] = 'TPU'
 os.environ['TOKENIZERS_PARALLELISM'] = "false"
 
 def main():
