@@ -40,11 +40,7 @@ log.setLevel(logging.DEBUG)
 log.addHandler(handler)
 
 
-wandb.init(
-   
-   
-   
-  )
+
 
 
 

@@ -11,6 +11,9 @@ from src.classes.model import BertForCounterfactualRobustness
 from  src.classes.datasets import ClassificationDataset
 import pickle
 import torch_xla.core.xla_model as xm
+import torch_xla.distributed.xla_multiprocessing as xmp
+import torch_xla.distributed.parallel_loader as pl
+
 from typing import Tuple, List, Union
 import json, psutil
 
@@ -100,28 +103,32 @@ def pretrainBERT(
     # device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     device = xm.xla_device()
     if os.path.exists(os.path.join(DATASET_PATH, "trainLoader.pickle.blosc")):
-      train_loader: DataLoader = pload(os.path.join(DATASET_PATH, "trainLoader"))
+      train_loader: Union[DataLoader, pl.MpDeviceLoader] = pload(os.path.join(DATASET_PATH, "trainLoader"))
     else:
-      train_loader: DataLoader = loadTrainData()
+      train_loader: Union[DataLoader, pl.MpDeviceLoader]  = loadTrainData()
     if os.path.exists(os.path.join(DATASET_PATH, "validLoader.pickle.blosc")):
-      valid_loader: DataLoader = pload(os.path.join(DATASET_PATH, "validLoader"))
+      valid_loader: Union[DataLoader, pl.MpDeviceLoader]  = pload(os.path.join(DATASET_PATH, "validLoader"))
     else:
-      valid_loader: DataLoader = loadValData()
+      valid_loader: Union[DataLoader, pl.MpDeviceLoader]  = loadValData()
     
 
+    train_loader = pl.MpDeviceLoader(train_loader, device)
+    valid_loader = pl.MpDeviceLoader(valid_loader, device)
+
+
     num_classes = -1
-    if len(train_loader.dataset[0]["label"].shape) == 1:
-      num_classes = train_loader.dataset[0]["label"].shape[0]
+    if len(train_loader.dataset[0]["label"].shape) == 1: #type:ignore
+      num_classes = train_loader.dataset[0]["label"].shape[0] #type:ignore
     else:
       s = set()
-      [s.add(x["labels"]) for x in train_loader.dataset]
+      [s.add(x["labels"]) for x in train_loader.dataset] #type:ignore
       num_classes = len(s)
 
 
 
     torch.cuda.empty_cache()
     model:torch.nn.Module = BertForCounterfactualRobustness.from_pretrained('bert-base-uncased', num_labels=num_classes)  # type: ignore
-    # model = torch.compile(model) #type: ignore
+    model = torch.compile(model) #type: ignore
     # model:torch.nn.Module = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=num_classes) #type: ignore  
     # model:torch.nn.Module = torch.compile(model) #type: ignore
     # model:BertForSequenceClassification = torch.nn.DataParallel(model)  # type: ignore # ! only use with distributed computing
@@ -179,7 +186,7 @@ def pretrainBERT(
         loss.sum().backward()
         # epoch_loss.append(loss.sum())
         train_progress_bar.set_description("Epoch train_accuracy %f" % train_metrics.compute().item())
-        optim.step()
+        xm.optimizer_step(optim)
         warmup.step()
         # scheduler.step()
         steps+=1
@@ -242,8 +249,7 @@ def pretrainBERT(
       pass
 
 
-
-  pretrainModel()
+  xmp.spawn(pretrainModel)
 
 
 

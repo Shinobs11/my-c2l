@@ -45,6 +45,7 @@ def main():
           "n_epochs_pt":20,
         }
         )
+        
     pretrainBERT(
         dataset_name=wandb.config.dataset,
         batch_size=wandb.config.batch_size_pt,
