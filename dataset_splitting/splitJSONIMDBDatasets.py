@@ -38,14 +38,16 @@ def convertToTable(items:typing.List[dict])-> pd.DataFrame:
 
   return table
   
-
+os.makedirs(os.path.join(DATASET_PATH, "base"))
 if(os.path.isdir(DATASET_PATH)):
   paths = glob.glob(os.path.join(DATASET_PATH, "*.json"))
   for p in paths:
     with open(p, mode='r') as f:
       table = convertToTable(json.load(f))
-      pdump(table, os.path.splitext(p)[0])
-      table.to_csv(os.path.splitext(p)[0] + ".csv", index=False)
+      path_no_ext = os.path.splitext(p)[0]
+      new_path = os.path.join(os.path.split(p)[0], "base", os.path.split(p)[1])
+      pdump(table, new_path)
+      table.to_csv(new_path + ".csv", index=False)
       
 else:
   with open(DATASET_PATH, mode='r') as f:
