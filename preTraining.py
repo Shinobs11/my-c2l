@@ -14,7 +14,7 @@ from  src.classes.datasets import ClassificationDataset
 
 
 import pickle
-
+import torch_xla.experimental.pjrt_backend 
 from torch.utils.data.distributed import DistributedSampler
 from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.distributed as dist
