@@ -45,13 +45,15 @@ def main():
           "n_epochs_pt":20,
         }
         )
-        
-    pretrainBERT(
-        dataset_name=wandb.config.dataset,
-        batch_size=wandb.config.batch_size_pt,
-        epoch_num=wandb.config.n_epochs_pt,
-        use_pinned_memory=False
-    )
+    
+    def map_pt(index):
+      pretrainBERT(
+          dataset_name=wandb.config.dataset,
+          batch_size=wandb.config.batch_size_pt,
+          epoch_num=wandb.config.n_epochs_pt,
+          use_pinned_memory=False
+      )
+    xmp.spawn(map_pt)
     wandb.finish()
 
 
