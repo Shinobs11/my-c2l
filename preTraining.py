@@ -112,8 +112,8 @@ def pretrainBERT(
       valid_loader: Union[DataLoader, pl.MpDeviceLoader]  = loadValData()
     
 
-    train_loader = pl.MpDeviceLoader(train_loader, device)
-    valid_loader = pl.MpDeviceLoader(valid_loader, device)
+    # train_loader = pl.MpDeviceLoader(train_loader, device)
+    # valid_loader = pl.MpDeviceLoader(valid_loader, device)
 
 
     num_classes = -1
@@ -249,7 +249,7 @@ def pretrainBERT(
       pass
 
 
-  xmp.spawn(pretrainModel)
+  # xmp.spawn(pretrainModel)
 
 
 
