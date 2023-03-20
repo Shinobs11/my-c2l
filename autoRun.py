@@ -41,7 +41,7 @@ def main():
         reinit=True,
         config={
           "dataset": dataset_name,
-          "batch_size_pt": 32,
+          "batch_size_pt": 8,
           "n_epochs_pt":20,
         }
         )

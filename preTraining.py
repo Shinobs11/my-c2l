@@ -260,7 +260,7 @@ def pretrainBERT(
       pass
 
 
-  xmp.spawn(pretrainModel)
+  xmp.spawn(pretrainModel, nprocs=8)
   # pretrainModel()
 
 
