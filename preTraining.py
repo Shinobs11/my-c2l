@@ -15,11 +15,15 @@ from  src.classes.datasets import ClassificationDataset
 
 import pickle
 
+from torch.utils.data.distributed import DistributedSampler
 from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.distributed as dist
 import torch_xla.core.xla_model as xm
 import torch_xla.distributed.xla_multiprocessing as xmp
 import torch_xla.distributed.parallel_loader as pl
+pjrt = xm.pjrt
+
+
 
 from typing import Tuple, List, Union
 import json, psutil
@@ -49,17 +53,6 @@ def pretrainBERT(
   OUTPUT_PATH = f"checkpoints/{DATASET_NAME}/model"
 
 
-
-
-
-
-# memAvailable = psutil.virtual_memory().available
-# estimatedMemConsumed = os.path.getsize(os.path.join(DATASET_PATH, "train_set.pickle.blosc")) * 3
-# USE_PINNED_MEMORY = True if (args.use_pinned_memory & (memAvailable > estimatedMemConsumed)) == 1 else False
-
-
-
-
   def loadTrainData():
 
 
@@ -74,13 +67,8 @@ def pretrainBERT(
     pdump(train_encodings, os.path.join(DATASET_PATH, "train_encodings"))
     
     train_dataset = ClassificationDataset(labels=train_labels, encodings=train_encodings)
-    train_loader = DataLoader(
-      train_dataset,
-      batch_size=BATCH_SIZE,
-      shuffle=False, #TODOS: test impact of shuffle
-      pin_memory=use_pinned_memory
-      )
-    return train_loader
+
+    return train_dataset
 
   def loadValData():
     tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
@@ -92,177 +80,223 @@ def pretrainBERT(
     pdump(valid_encodings, os.path.join(DATASET_PATH, "valid_encodings"))
 
     valid_dataset = ClassificationDataset(labels=valid_labels, encodings=valid_encodings)
-    valid_loader = DataLoader(
-      valid_dataset,
-      batch_size=BATCH_SIZE,
-      shuffle=False,
-      pin_memory=use_pinned_memory
-    )
 
-    return valid_loader
+
+    return valid_dataset
 
 
 
-  def pretrainModel():
-
-    
-
-    # device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    
-    device = xm.xla_device()
-    dist.init_process_group('xla', init_method='pjrt://')
-    if os.path.exists(os.path.join(DATASET_PATH, "trainLoader.pickle.blosc")):
-      train_loader: Union[DataLoader, pl.MpDeviceLoader] = pload(os.path.join(DATASET_PATH, "trainLoader"))
-    else:
-      train_loader: Union[DataLoader, pl.MpDeviceLoader]  = loadTrainData()
-    if os.path.exists(os.path.join(DATASET_PATH, "validLoader.pickle.blosc")):
-      valid_loader: Union[DataLoader, pl.MpDeviceLoader]  = pload(os.path.join(DATASET_PATH, "validLoader"))
-    else:
-      valid_loader: Union[DataLoader, pl.MpDeviceLoader]  = loadValData()
-    
-
-    train_loader = pl.MpDeviceLoader(train_loader, device)
-    valid_loader = pl.MpDeviceLoader(valid_loader, device)
 
 
-    num_classes = -1
-    if len(train_loader.dataset[0]["label"].shape) == 1: #type:ignore
-      num_classes = train_loader.dataset[0]["label"].shape[0] #type:ignore
-    else:
-      s = set()
-      [s.add(x["labels"]) for x in train_loader.dataset] #type:ignore
-      num_classes = len(s)
+  def map_pt(index):
+
+    def pretrainModel():
+      #acquire tpu device
+      device = xm.xla_device(index)
+      #initialize distributed package with url
+      dist.init_process_group('xla', init_method='pjrt://')
 
 
+      #stops all child workers here and waits for master to rendezvous
+      if not xm.is_master_ordinal():
+        xm.rendezvous('dataset_prep')
+  
+      train_dataset  = loadTrainData()
+      valid_dataset = loadValData()
 
-    torch.cuda.empty_cache()
-    model:torch.nn.Module = BertForCounterfactualRobustness.from_pretrained('bert-base-uncased', num_labels=num_classes)  # type: ignore
-    model = DDP(model, gradient_as_bucket_view=True)
-    # model = torch.compile(model) #type: ignore
-    # model:torch.nn.Module = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=num_classes) #type: ignore  
-    # model:torch.nn.Module = torch.compile(model) #type: ignore
-    # model:BertForSequenceClassification = torch.nn.DataParallel(model)  # type: ignore # ! only use with distributed computing
-    model.to(device)
+      if xm.pjrt.world_size() > 1:
+        train_sampler = DistributedSampler(
+            train_dataset,
+            num_replicas=xm.xrt_world_size(),
+            rank=xm.get_ordinal(),
+            shuffle=False
+          )
+        valid_sampler = DistributedSampler(
+            valid_dataset,
+            num_replicas=xm.xrt_world_size(),
+            rank=xm.get_ordinal(),
+            shuffle=False
+          )
+      else:
+        train_sampler = None
+        valid_sampler = None
 
-    optim = torch.optim.AdamW(model.parameters(), lr=5e-5)
-    # scheduler = get_linear_schedule_with_warmup(optim, num_warmup_steps=50, num_training_steps=len(train_loader)*EPOCH_NUM)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode='min', factor=0.5, patience=3, verbose=True)
-    warmup = get_constant_schedule_with_warmup(optim, num_warmup_steps=int(len(train_loader)*0.10))
-    steps = 0
-    best_acc = 0
-    best_epoch = -1
-    all_loss = []
+              
+      train_loader = DataLoader(
+        train_dataset,
+        batch_size=BATCH_SIZE,
+        shuffle=False,
+        pin_memory=use_pinned_memory,
+        sampler=train_sampler
+      )
+      valid_loader = DataLoader(
+        valid_dataset,
+        batch_size=BATCH_SIZE,
+        shuffle=False,
+        pin_memory=use_pinned_memory,
+        sampler=valid_sampler
+      )
 
+      train_loader = pl.MpDeviceLoader(train_loader, device)
+      valid_loader = pl.MpDeviceLoader(valid_loader, device)
 
-
-    for epoch in range(EPOCH_NUM):
-      train_metrics: MulticlassAccuracy  = MulticlassAccuracy(num_classes=num_classes).to(device)
-      valid_metrics: MulticlassAccuracy = MulticlassAccuracy(num_classes=num_classes).to(device)
-      model.train() # switch to training mode
-      train_progress_bar = tqdm(train_loader)
-
-      for batch in train_progress_bar:
-        optim.zero_grad()
-        
-        input_ids = batch['input_ids'].to(device, dtype=torch.long)
-        attention_mask = batch['attention_mask'].to(device, dtype=torch.long)
-        token_type_ids = batch['token_type_ids'].to(device, dtype=torch.long)
-        labels = batch['label'].to(device)
-        true_labels = labels #shape = [n_labels]
-        _, labels = torch.max(labels, dim = 1)  
-
-
-        outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model(
-          anchor_input_ids=input_ids,
-          anchor_attention_mask=attention_mask,
-          anchor_token_type_ids=token_type_ids,
-          labels=labels,
-          return_dict=True
-        )
-        assert isinstance(outputs, SequenceClassifierOutput)
-
-
-        loss:torch.Tensor = outputs['loss']
-        logits:torch.Tensor = outputs['logits']
-
-        
-        _, pred_labels_idx = logits.max(dim=1)
-
-        _, true_labels_idx = true_labels.max(dim=1)
-
-        train_metrics.update(pred_labels_idx, true_labels_idx)
+      #master rendezvous here and allows execution to continue.
+      if xm.is_master_ordinal():
+        xm.rendezvous('dataset_prep')
 
 
-        loss.sum().backward()
-        # epoch_loss.append(loss.sum())
-        train_progress_bar.set_description("Epoch train_accuracy %f" % train_metrics.compute().item())
-        optim.step()
-        warmup.step()
-        xm.mark_step()
-        # scheduler.step()
-        steps+=1
-
-      # all_loss.append(epoch_loss)
-      model.eval()# setting model to evaluation mode
+      num_classes = -1
+      if len(train_loader.dataset[0]["label"].shape) == 1: #type:ignore
+        num_classes = train_loader.dataset[0]["label"].shape[0] #type:ignore
+      else:
+        s = set()
+        [s.add(x["labels"]) for x in train_loader.dataset] #type:ignore
+        num_classes = len(s)
 
 
 
-      accuracy = 0.0
-      val_loss = 0.0
-      for batch in valid_loader:
-        with torch.no_grad():
-          # labels = batch['label'].to(device)
+      model:torch.nn.Module = BertForCounterfactualRobustness.from_pretrained('bert-base-uncased', num_labels=num_classes)  # type: ignore
+      
+      if pjrt.using_pjrt():
+        pjrt.broadcast_master_param(model)
+
+
+      model = DDP(model, gradient_as_bucket_view=True) #TODOS: Figure out if DDP is useful here
+      model.to(device)
+
+      optim = torch.optim.AdamW(model.parameters(), lr=5e-5)
+      # scheduler = get_linear_schedule_with_warmup(optim, num_warmup_steps=50, num_training_steps=len(train_loader)*EPOCH_NUM)
+      scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode='min', factor=0.5, patience=3, verbose=True)
+      warmup = get_constant_schedule_with_warmup(optim, num_warmup_steps=int(len(train_loader)*0.10))
+      steps = 0
+      best_acc = 0
+      best_epoch = -1
+      all_loss = []
+
+
+
+      for epoch in range(EPOCH_NUM):
+        train_metrics: MulticlassAccuracy  = MulticlassAccuracy(num_classes=num_classes).to(device)
+        valid_metrics: MulticlassAccuracy = MulticlassAccuracy(num_classes=num_classes).to(device)
+        model.train() # switch to training mode
+        train_progress_bar = tqdm(train_loader)
+
+        for batch in train_progress_bar:
+          optim.zero_grad()
+          
           input_ids = batch['input_ids'].to(device, dtype=torch.long)
           attention_mask = batch['attention_mask'].to(device, dtype=torch.long)
           token_type_ids = batch['token_type_ids'].to(device, dtype=torch.long)
-          true_labels = batch['label'].to(device)
+          labels = batch['label'].to(device)
+          true_labels = labels #shape = [n_labels]
+          _, labels = torch.max(labels, dim = 1)  
+
+
           outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model(
-            labels=true_labels,
             anchor_input_ids=input_ids,
             anchor_attention_mask=attention_mask,
             anchor_token_type_ids=token_type_ids,
+            labels=labels,
             return_dict=True
           )
           assert isinstance(outputs, SequenceClassifierOutput)
-          loss = outputs['loss']
-          logits = outputs['logits']
-          val_loss += loss.sum()
+
+
+          loss:torch.Tensor = outputs['loss']
+          logits:torch.Tensor = outputs['logits']
+
+          
           _, pred_labels_idx = logits.max(dim=1)
+
           _, true_labels_idx = true_labels.max(dim=1)
-          # print("Preds:",pred_labels_idx)
-          # print("Trues:",true_labels_idx)
-          valid_metrics.update(pred_labels_idx, true_labels_idx)
-  
-        accuracy = valid_metrics.compute().item()
-      if accuracy >= best_acc:
-        best_epoch = epoch
-        best_acc = accuracy
-      print(f"Accuracy: {accuracy}")
-      scheduler.step(val_loss)
-      wandb.log({"valid accuracy": accuracy, "valid loss": val_loss})
-      model.save_pretrained(os.path.join(OUTPUT_PATH, f"epoch_{epoch}")) #type:ignore
-    pdump(all_loss, os.path.join(OUTPUT_PATH,"training_loss"))
-    print(f"\nBest model is epoch {best_epoch}.")
-    print(f"\nBest accuracy is {best_acc}")
-    try:
-      for x in glob.glob(os.path.join(OUTPUT_PATH, "best_epoch", "*")):
-        os.remove(x)
-      os.rmdir(os.path.join(OUTPUT_PATH, "best_epoch"))
-    except:
-      pass
-    os.rename(os.path.join(OUTPUT_PATH, f"epoch_{best_epoch}"), os.path.join(OUTPUT_PATH, "best_epoch"))
-    try:
-      for x in glob.glob(os.path.join(OUTPUT_PATH, "epoch_*")):
-        for y in glob.glob(os.path.join(x, "*")):
-          os.remove(y)
-        os.rmdir(x)
-    except:
-      pass
+
+          train_metrics.update(pred_labels_idx, true_labels_idx)
 
 
-  # xmp.spawn(pretrainModel)
-  pretrainModel()
+          loss.sum().backward()
+          # epoch_loss.append(loss.sum())
+          train_progress_bar.set_description("Epoch train_accuracy %f" % train_metrics.compute().item())
 
+
+          xm.optimizer_step(optim)
+
+          warmup.step()
+          xm.mark_step()
+          # scheduler.step()
+          steps+=1
+
+        # all_loss.append(epoch_loss)
+        model.eval()# setting model to evaluation mode
+
+
+
+        accuracy = 0.0
+        val_loss = 0.0
+        for batch in valid_loader:
+          with torch.no_grad():
+            # labels = batch['label'].to(device)
+            input_ids = batch['input_ids'].to(device, dtype=torch.long)
+            attention_mask = batch['attention_mask'].to(device, dtype=torch.long)
+            token_type_ids = batch['token_type_ids'].to(device, dtype=torch.long)
+            true_labels = batch['label'].to(device)
+            outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model(
+              labels=true_labels,
+              anchor_input_ids=input_ids,
+              anchor_attention_mask=attention_mask,
+              anchor_token_type_ids=token_type_ids,
+              return_dict=True
+            )
+            assert isinstance(outputs, SequenceClassifierOutput)
+            loss = outputs['loss']
+            logits = outputs['logits']
+            val_loss += loss.sum()
+            _, pred_labels_idx = logits.max(dim=1)
+            _, true_labels_idx = true_labels.max(dim=1)
+            # print("Preds:",pred_labels_idx)
+            # print("Trues:",true_labels_idx)
+            valid_metrics.update(pred_labels_idx, true_labels_idx)
+    
+          accuracy = valid_metrics.compute().item()
+        if accuracy >= best_acc:
+          best_epoch = epoch
+          best_acc = accuracy
+
+
+        xm.master_print(f"Accuracy: {accuracy}")
+        scheduler.step(val_loss)
+
+        if xm.is_master_ordinal():
+          wandb.log({"valid accuracy": accuracy, "valid loss": val_loss})
+          model.save_pretrained(os.path.join(OUTPUT_PATH, f"epoch_{epoch}")) #type:ignore
+      # pdump(all_loss, os.path.join(OUTPUT_PATH,"training_loss"))
+      xm.master_print(f"\nBest model is epoch {best_epoch}.")
+      xm.master_print(f"\nBest accuracy is {best_acc}")
+
+      if xm.is_master_ordinal():
+        try:
+          for x in glob.glob(os.path.join(OUTPUT_PATH, "best_epoch", "*")):
+            os.remove(x)
+          os.rmdir(os.path.join(OUTPUT_PATH, "best_epoch"))
+        except:
+          pass
+        os.rename(os.path.join(OUTPUT_PATH, f"epoch_{best_epoch}"), os.path.join(OUTPUT_PATH, "best_epoch"))
+        try:
+          for x in glob.glob(os.path.join(OUTPUT_PATH, "epoch_*")):
+            for y in glob.glob(os.path.join(x, "*")):
+              os.remove(y)
+            os.rmdir(x)
+        except:
+          pass
+
+
+    
+    pretrainModel()
+
+
+
+
+
+  xmp.spawn(map_pt)
 
 
 
