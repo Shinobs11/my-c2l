@@ -89,7 +89,7 @@ def pretrainBERT(
 
 
   def map_pt(index):
-
+    print(f"Started process on index {index}")
     def pretrainModel():
       #acquire tpu device
       device = xm.xla_device(index)
