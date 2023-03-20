@@ -128,7 +128,7 @@ def pretrainBERT(
 
     torch.cuda.empty_cache()
     model:torch.nn.Module = BertForCounterfactualRobustness.from_pretrained('bert-base-uncased', num_labels=num_classes)  # type: ignore
-    model = torch.compile(model) #type: ignore
+    # model = torch.compile(model) #type: ignore
     # model:torch.nn.Module = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=num_classes) #type: ignore  
     # model:torch.nn.Module = torch.compile(model) #type: ignore
     # model:BertForSequenceClassification = torch.nn.DataParallel(model)  # type: ignore # ! only use with distributed computing
