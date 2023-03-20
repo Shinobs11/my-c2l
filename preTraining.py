@@ -9,7 +9,14 @@ from src.proecssing import correct_count
 from transformers.models.bert.modeling_bert import SequenceClassifierOutput
 from src.classes.model import BertForCounterfactualRobustness
 from  src.classes.datasets import ClassificationDataset
+
+
+
+
 import pickle
+
+from torch.nn.parallel import DistributedDataParallel as DDP
+import torch.distributed as dist
 import torch_xla.core.xla_model as xm
 import torch_xla.distributed.xla_multiprocessing as xmp
 import torch_xla.distributed.parallel_loader as pl
@@ -78,7 +85,7 @@ def pretrainBERT(
   def loadValData():
     tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
 
-    valid_set = pload(os.path.join(DATASET_PATH, "valid_set"))[0:10]
+    valid_set = pload(os.path.join(DATASET_PATH, "valid_set"))
     valid_texts:list[str] = valid_set['text'].tolist()
     valid_labels: list = valid_set['label'].tolist()
     valid_encodings = tokenizer(valid_texts, padding=True, truncation=True)
@@ -101,7 +108,9 @@ def pretrainBERT(
     
 
     # device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    
     device = xm.xla_device()
+    dist.init_process_group('xla', init_method='pjrt://')
     if os.path.exists(os.path.join(DATASET_PATH, "trainLoader.pickle.blosc")):
       train_loader: Union[DataLoader, pl.MpDeviceLoader] = pload(os.path.join(DATASET_PATH, "trainLoader"))
     else:
@@ -112,8 +121,8 @@ def pretrainBERT(
       valid_loader: Union[DataLoader, pl.MpDeviceLoader]  = loadValData()
     
 
-    # train_loader = pl.MpDeviceLoader(train_loader, device)
-    # valid_loader = pl.MpDeviceLoader(valid_loader, device)
+    train_loader = pl.MpDeviceLoader(train_loader, device)
+    valid_loader = pl.MpDeviceLoader(valid_loader, device)
 
 
     num_classes = -1
@@ -128,6 +137,7 @@ def pretrainBERT(
 
     torch.cuda.empty_cache()
     model:torch.nn.Module = BertForCounterfactualRobustness.from_pretrained('bert-base-uncased', num_labels=num_classes)  # type: ignore
+    model = DDP(model, gradient_as_bucket_view=True)
     # model = torch.compile(model) #type: ignore
     # model:torch.nn.Module = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=num_classes) #type: ignore  
     # model:torch.nn.Module = torch.compile(model) #type: ignore
@@ -162,7 +172,7 @@ def pretrainBERT(
         _, labels = torch.max(labels, dim = 1)  
 
 
-        outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model.forward(
+        outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model(
           anchor_input_ids=input_ids,
           anchor_attention_mask=attention_mask,
           anchor_token_type_ids=token_type_ids,
@@ -186,8 +196,9 @@ def pretrainBERT(
         loss.sum().backward()
         # epoch_loss.append(loss.sum())
         train_progress_bar.set_description("Epoch train_accuracy %f" % train_metrics.compute().item())
-        xm.optimizer_step(optim)
+        optim.step()
         warmup.step()
+        xm.mark_step()
         # scheduler.step()
         steps+=1
 
@@ -205,7 +216,7 @@ def pretrainBERT(
           attention_mask = batch['attention_mask'].to(device, dtype=torch.long)
           token_type_ids = batch['token_type_ids'].to(device, dtype=torch.long)
           true_labels = batch['label'].to(device)
-          outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model.forward(
+          outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model(
             labels=true_labels,
             anchor_input_ids=input_ids,
             anchor_attention_mask=attention_mask,
@@ -249,8 +260,8 @@ def pretrainBERT(
       pass
 
 
-  # xmp.spawn(pretrainModel)
-  pretrainModel()
+  xmp.spawn(pretrainModel)
+  # pretrainModel()
 
 
 
