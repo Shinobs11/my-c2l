@@ -12,6 +12,10 @@ datasets/yelp_chi/augmented_triplets
 # datasets/yelp_nyc
 # datasets/yelp_zip
 
+datasets/*/base
+datasets/*/augmented_triplets
+
+
 *.pickle.blosc
 *.pickle
 *.bin
