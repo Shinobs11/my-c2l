@@ -27,8 +27,8 @@ os.environ['TOKENIZERS_PARALLELISM'] = "false"
 
 def main():
 
-    dataset_name = "original_augmented_1x_aclImdb"
-    experiment_id = "experiment-" + wbutil.generate_id()
+    dataset_name = "yelp_nyc"
+    experiment_id = f"{dataset_name}-experiment-{wbutil.generate_id()}"
 
     #pretrain
   
