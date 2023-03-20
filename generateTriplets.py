@@ -21,7 +21,7 @@ import random
 random.seed(0)
 from typing import Tuple, Union, List
 
-
+import torch_xla.core.xla_model as xm
 
 
 
@@ -54,8 +54,8 @@ def generateTiplets(
   
   VOCAB_SIZE = tokenizer.vocab_size
 
-  device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-
+  # device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+  device = xm.xla_device()
   train_set = pload(os.path.join(DATASET_PATH, "train_set"))
 
   train_texts = train_set["text"].tolist()

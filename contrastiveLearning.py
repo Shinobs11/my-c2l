@@ -55,7 +55,7 @@ wandb.init(
 
 
 # device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-device = torch.device('cuda') if torch.cuda.is_available() else xm.xla_device()
+device = xm.xla_device()
 
 def constrastiveTrain(
   dataset_name: str,

@@ -40,7 +40,7 @@ def main():
         reinit=True,
         config={
           "dataset": dataset_name,
-          "batch_size_pt":24,
+          "batch_size_pt":1024,
           "n_epochs_pt":20,
         }
         )
@@ -88,7 +88,7 @@ def main():
         reinit=True,
         config={
        "dataset": dataset_name,
-        "batch_size_cl": 8,
+        "batch_size_cl": 256,
         "n_epochs_cl": 20,
         "lambda_weight": 0.1,
        }
@@ -111,7 +111,7 @@ def main():
         reinit=True,
         config={
        "dataset": dataset_name,
-       "batch_size_pt_eval": 24,
+       "batch_size_pt_eval": 1024,
        }
     )
     evaluateModel(
@@ -130,7 +130,7 @@ def main():
         reinit=True,
         config={
        "dataset": dataset_name,
-        "batch_size_cl_eval": 24,
+        "batch_size_cl_eval": 1024,
        }
     )
     evaluateModel(

@@ -10,8 +10,8 @@ from transformers.models.bert.modeling_bert import SequenceClassifierOutput
 from src.classes.model import BertForCounterfactualRobustness
 from  src.classes.datasets import ClassificationDataset
 import pickle
-
-
+import torch_xla.core.xla_model as xm
+from typing import Tuple, List, Union
 import json, psutil
 
 from torchmetrics import MetricCollection
@@ -97,8 +97,8 @@ def pretrainBERT(
 
     
 
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-
+    # device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    device = xm.xla_device()
     if os.path.exists(os.path.join(DATASET_PATH, "trainLoader.pickle.blosc")):
       train_loader: DataLoader = pload(os.path.join(DATASET_PATH, "trainLoader"))
     else:
@@ -155,7 +155,7 @@ def pretrainBERT(
         _, labels = torch.max(labels, dim = 1)  
 
 
-        outputs:SequenceClassifierOutput|tuple[torch.Tensor] = model.forward(
+        outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model.forward(
           anchor_input_ids=input_ids,
           anchor_attention_mask=attention_mask,
           anchor_token_type_ids=token_type_ids,
@@ -198,7 +198,7 @@ def pretrainBERT(
           attention_mask = batch['attention_mask'].to(device, dtype=torch.long)
           token_type_ids = batch['token_type_ids'].to(device, dtype=torch.long)
           true_labels = batch['label'].to(device)
-          outputs:SequenceClassifierOutput|tuple[torch.Tensor] = model.forward(
+          outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model.forward(
             labels=true_labels,
             anchor_input_ids=input_ids,
             anchor_attention_mask=attention_mask,
