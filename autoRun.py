@@ -5,6 +5,7 @@ from evaluateModel import evaluateModel
 from contrastiveLearning import constrastiveTrain
 from generateTriplets import generateTiplets
 import torch_xla.core.xla_model as xm
+import torch_xla.distributed.xla_multiprocessing as xmp
 import torch
 torch.manual_seed(0)
 import numpy as np
@@ -40,7 +41,7 @@ def main():
         reinit=True,
         config={
           "dataset": dataset_name,
-          "batch_size_pt":1024,
+          "batch_size_pt":128,
           "n_epochs_pt":20,
         }
         )
@@ -88,7 +89,7 @@ def main():
         reinit=True,
         config={
        "dataset": dataset_name,
-        "batch_size_cl": 256,
+        "batch_size_cl": 16,
         "n_epochs_cl": 20,
         "lambda_weight": 0.1,
        }
