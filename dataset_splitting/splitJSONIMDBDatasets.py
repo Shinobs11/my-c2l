@@ -2,7 +2,7 @@ import sys, os
 sys.path.append(f"{os.getcwd()}")
 
 from  src.utils.pickleUtils import pload, pdump, pjoin
-import os, json, argparse, glob
+import os, json, argparse, glob, typing
 import ast
 import pandas as pd
 
@@ -17,9 +17,9 @@ args = parser.parse_args()
 
 DATASET_PATH = args.dataset_path
 
-def convertToTable(items:list[dict])-> pd.DataFrame:
+def convertToTable(items:typing.List[dict])-> pd.DataFrame:
   
-  table_dict:dict[str, list] = {
+  table_dict:typing.Dict[str, list] = {
     "anchor_text": [],
     "label": []
   }
