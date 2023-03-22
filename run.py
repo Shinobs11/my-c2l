@@ -162,7 +162,8 @@ def main():
     # wandb.finish()
 
 def test_fn(index, args):
-  
+  xm.master_print(f"MasterPrint: Started process on index {index}")
+  xm.master_print(f"My name is {__name__}")
   print(f"Started process on index {index}")
   log = logSetup(f"logs/pt/{args.dataset_name}_{index}", f"logs/pt/{args.dataset_name}_{index}.log", logging.INFO, None)
   log.info(f"Started process on index {index}")
@@ -187,7 +188,7 @@ if __name__ == '__main__':
     use_wandb=False
   )
 
-  xmp.spawn(test_fn, args=(test_fn), start_method='fork', join=True)
+  xmp.spawn(test_fn, args=(args_pt,), start_method='spawn', join=True)
 
 
 

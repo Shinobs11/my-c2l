@@ -5,9 +5,9 @@ import os
 
 
 def test_fn(index):
-  print("Hello world from process {}".format(index))
+  return
 
 
-if __name__ == '__main__':
 
-  xmp.spawn(test_fn, args=(), start_method='spawn', join=True)
+if __name__ == "__main__":
+  xmp.spawn(test_fn)
