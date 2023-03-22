@@ -12,10 +12,15 @@ import numpy as np
 np.random.seed(0)
 import random
 random.seed(0)
-
+import logging
+from src.logging.logSetup import logSetup
 import wandb
 import wandb.util as wbutil
 import random
+
+from src.arg_classes import Args_PT
+
+
 
 # if torch.cuda.is_available():
 #   os.environ['PJRT_DEVICE'] = 'GPU'
@@ -26,35 +31,47 @@ import random
 os.environ['PJRT_DEVICE'] = 'TPU'
 os.environ['TOKENIZERS_PARALLELISM'] = "false"
 
+
+
 def main():
 
+    print("Entered main")
     dataset_name = "yelp_nyc"
     experiment_id = f"{dataset_name}-experiment-{wbutil.generate_id()}"
 
     #pretrain
   
 
-    wandb.init(
-        project="my-c2l",
-        group=experiment_id,
-        job_type="pretrain",
-        reinit=True,
-        config={
-          "dataset": dataset_name,
-          "batch_size_pt": 8,
-          "n_epochs_pt":20,
-        }
-        )
+
+    # wandb.init(
+    #     project="my-c2l",
+    #     group=experiment_id,
+    #     job_type="pretrain",
+    #     reinit=True,
+    #     config={
+    #       "dataset": dataset_name,
+    #       "batch_size_pt": 8,
+    #       "n_epochs_pt":20,
+    #     }
+    #     )
     
 
-    pretrainBERT(
-        dataset_name=wandb.config.dataset,
-        batch_size=wandb.config.batch_size_pt,
-        epoch_num=wandb.config.n_epochs_pt,
-        use_pinned_memory=False
-    )
+    # pretrainBERT(
+    #     dataset_name=wandb.config.dataset,
+    #     batch_size=wandb.config.batch_size_pt,
+    #     epoch_num=wandb.config.n_epochs_pt,
+    #     use_pinned_memory=False,
+    #     use_wandb=False
+    # )
 
-    wandb.finish()
+    pretrainBERT(
+        dataset_name=dataset_name,
+        batch_size = 8,
+        epoch_num = 20,
+        use_pinned_memory=False,
+        use_wandb=False
+    )
+    # wandb.finish()
 
 
     # #triplets
@@ -144,5 +161,34 @@ def main():
     # )
     # wandb.finish()
 
-if __name__=="__main__":
-    main()
+def test_fn(index, args):
+  
+  print(f"Started process on index {index}")
+  log = logSetup(f"logs/pt/{args.dataset_name}_{index}", f"logs/pt/{args.dataset_name}_{index}.log", logging.INFO, None)
+  log.info(f"Started process on index {index}")
+  device = xm.xla_device()
+  log.info(f"Device: {device}")
+  
+  test_tensor = torch.tensor([1,2,3,4,5]).to(device)
+  test_tensor = test_tensor.sum()
+  log.info(f"Test tensor post-sum: {test_tensor}")
+  res_tensor = xm.all_reduce(xm.REDUCE_SUM, [test_tensor], scale=1.0)
+  log.info(f"Result tensor: {res_tensor}")
+
+
+if __name__ == '__main__':
+  print(f"My name is {__name__}")
+  # xmp.spawn(main, nprocs=1, start_method='spawn')
+  args_pt = Args_PT(
+    dataset_name="yelp_nyc",
+    batch_size=8,
+    epoch_num=20,
+    use_pinned_memory=False,
+    use_wandb=False
+  )
+
+  xmp.spawn(test_fn, args=(test_fn), start_method='fork', join=True)
+
+
+
+  # main()
