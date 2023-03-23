@@ -51,7 +51,7 @@ log.addHandler(handler)
 
 
 # device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-device = xm.xla_device()
+
 
 def constrastiveTrain(
   dataset_name: str,
@@ -59,7 +59,7 @@ def constrastiveTrain(
   epoch_num: int,
   lambda_weight: float
 ):
-
+  device = xm.xla_device()
   DATASET_NAME = dataset_name
   DATASET_PATH = f"datasets/{DATASET_NAME}/augmented_triplets"
   OUTPUT_PATH = f"checkpoints/{DATASET_NAME}/augmented_model"

@@ -1,8 +1,8 @@
 from torch import topk
 import wandb, os
 from preTraining import pretrainBERT
-from evaluateModel import evaluateModel
-from contrastiveLearning import constrastiveTrain
+from evaluateModel import evaluateModel 
+from contrastiveLearning import constrastiveTrain #TODOS: figure out why these imports break EVERYTHING
 from generateTriplets import generateTiplets
 import torch_xla.core.xla_model as xm
 import torch_xla.distributed.xla_multiprocessing as xmp
@@ -18,7 +18,7 @@ import wandb
 import wandb.util as wbutil
 import random
 
-from src.arg_classes import Args_PT
+# from src.arg_classes import Args_PT
 
 
 
@@ -28,16 +28,18 @@ from src.arg_classes import Args_PT
 #   os.environ['PJRT_DEVICE'] = 'TPU'
 # else:
 #   os.environ['PJRT_DEVICE'] = 'CPU'
-os.environ['PJRT_DEVICE'] = 'TPU'
-os.environ['TOKENIZERS_PARALLELISM'] = "false"
-
+# os.environ['PJRT_DEVICE'] = 'TPU'
+# os.environ['TOKENIZERS_PARALLELISM'] = "false"
+# os.environ['XRT_TPU_CONFIG'] = 'localservice;0;localhost:51011'
+# os.environ['MASTER_ADDR'] = 'localhost'
+# os.environ['MASTER_PORT'] = '12355'
 
 
 def main():
 
-    print("Entered main")
+    # print("Entered main")
     dataset_name = "yelp_nyc"
-    experiment_id = f"{dataset_name}-experiment-{wbutil.generate_id()}"
+    # experiment_id = f"{dataset_name}-experiment-{wbutil.generate_id()}"
 
     #pretrain
   
@@ -161,35 +163,35 @@ def main():
     # )
     # wandb.finish()
 
-def test_fn(index, args):
-  xm.master_print(f"MasterPrint: Started process on index {index}")
-  xm.master_print(f"My name is {__name__}")
-  print(f"Started process on index {index}")
-  log = logSetup(f"logs/pt/{args.dataset_name}_{index}", f"logs/pt/{args.dataset_name}_{index}.log", logging.INFO, None)
-  log.info(f"Started process on index {index}")
-  device = xm.xla_device()
-  log.info(f"Device: {device}")
+# def test_fn(index, args):
+#   xm.master_print(f"MasterPrint: Started process on index {index}")
+#   xm.master_print(f"My name is {__name__}")
+#   print(f"Started process on index {index}")
+#   log = logSetup(f"logs/pt/{args.dataset_name}_{index}", f"logs/pt/{args.dataset_name}_{index}.log", logging.INFO, None)
+#   log.info(f"Started process on index {index}")
+#   device = xm.xla_device()
+#   log.info(f"Device: {device}")
   
-  test_tensor = torch.tensor([1,2,3,4,5]).to(device)
-  test_tensor = test_tensor.sum()
-  log.info(f"Test tensor post-sum: {test_tensor}")
-  res_tensor = xm.all_reduce(xm.REDUCE_SUM, [test_tensor], scale=1.0)
-  log.info(f"Result tensor: {res_tensor}")
+#   test_tensor = torch.tensor([1,2,3,4,5]).to(device)
+#   test_tensor = test_tensor.sum()
+#   log.info(f"Test tensor post-sum: {test_tensor}")
+#   res_tensor = xm.all_reduce(xm.REDUCE_SUM, [test_tensor], scale=1.0)
+#   log.info(f"Result tensor: {res_tensor}")
 
 
 if __name__ == '__main__':
   print(f"My name is {__name__}")
   # xmp.spawn(main, nprocs=1, start_method='spawn')
-  args_pt = Args_PT(
-    dataset_name="yelp_nyc",
-    batch_size=8,
-    epoch_num=20,
-    use_pinned_memory=False,
-    use_wandb=False
-  )
+  # args_pt = Args_PT(
+  #   dataset_name="yelp_nyc",
+  #   batch_size=8,
+  #   epoch_num=20,
+  #   use_pinned_memory=False,
+  #   use_wandb=False
+  # )
 
-  xmp.spawn(test_fn, args=(args_pt,), start_method='spawn', join=True)
+  # xmp.spawn(test_fn, args=(args_pt,), start_method='spawn', join=True)
 
 
 
-  # main()
+  main()
