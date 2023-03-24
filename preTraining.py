@@ -16,7 +16,7 @@ from src.arg_classes import Args_PT
 
 import pickle
 
-from torch.utils.data.distributed import DistributedSampler
+
 from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.distributed as dist
 import torch_xla.core.xla_model as xm
@@ -34,14 +34,35 @@ import torch_xla.experimental.pjrt_backend
 import torch_xla.experimental.pjrt as pjrt
 torch.manual_seed(0)
 
+import os
+# import schedulers
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.nn.parallel import DistributedDataParallel as DDP
+import torch.optim as optim
+import torchvision
+import torchvision.transforms as transforms
+import torch_xla
+import torch_xla.debug.metrics as met
+import torch_xla.distributed.parallel_loader as pl
+import torch_xla.debug.profiler as xp
+import torch_xla.utils.utils as xu
+import torch_xla.core.xla_model as xm
+import torch_xla.distributed.xla_multiprocessing as xmp
+import torch_xla.test.test_utils as test_utils
 
-
+import torch.distributed as dist
+import torch_xla.distributed.xla_backend
+from torch.utils.data.distributed import DistributedSampler
+from src.logging import print_training_update, print_test_update
 
 
 
 def loadTrainData(dataset_path: str):
   tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
-  train_set = pload(os.path.join(dataset_path, "train_set"))
+  train_set = pload(os.path.join(dataset_path, "train_set"))[0:10]
   train_labels:list = train_set['label'].tolist()
   train_texts:list[str] = train_set['text'].tolist()
   
@@ -57,7 +78,7 @@ def loadTrainData(dataset_path: str):
 def loadValData(dataset_path: str):
   tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
 
-  valid_set = pload(os.path.join(dataset_path, "valid_set"))
+  valid_set = pload(os.path.join(dataset_path, "valid_set"))[0:10]
   valid_texts:list[str] = valid_set['text'].tolist()
   valid_labels: list = valid_set['label'].tolist()
   valid_encodings = tokenizer(valid_texts, padding=True, truncation=True)
@@ -70,6 +91,15 @@ def loadValData(dataset_path: str):
 
 
 
+def _train_update(device, step, loss, tracker, epoch):
+  test_utils.print_training_update(
+      device,
+      step,
+      loss.item(),
+      tracker.rate(),
+      tracker.global_rate(),
+      epoch)
+  
 #TODOS: Rewrite as class or non-nested function, issue might be that function is pickled and transferred elsewhere
 #But if the function can't be pickled, then the function can't be transferred.
 
@@ -78,8 +108,8 @@ def loadValData(dataset_path: str):
 
 def map_pt(index, args_map: Args_Map_PT):
   args = args_map.args_pt
-  # dist.init_process_group('xla', init_method='pjrt://')
-  dist.init_process_group('xla', world_size=xm.xrt_world_size(), rank=xm.get_ordinal())
+  dist.init_process_group('xla', init_method='pjrt://')
+  # dist.init_process_group('xla', world_size=xm.xrt_world_size(), rank=xm.get_ordinal())
   device = xm.xla_device()
   print(f"Started process on index {index}")
   log = logSetup(f"logs/pt/{args.dataset_name}_{index}", f"logs/pt/{args.dataset_name}_{index}.log", logging.INFO, None)
@@ -90,8 +120,8 @@ def map_pt(index, args_map: Args_Map_PT):
   test_tensor = torch.tensor([1,2,3,4,5]).to(device)
   test_tensor = test_tensor.sum()
   log.info(f"Test tensor post-sum: {test_tensor}")
-  res_tensor = xm.all_reduce(xm.REDUCE_SUM, [test_tensor], scale=1.0)
-  log.info(f"Result tensor: {res_tensor}")
+  # res_tensor = xm.all_reduce(xm.REDUCE_SUM, [test_tensor], scale=1.0)
+  # log.info(f"Result tensor: {res_tensor}")
 
 
 
@@ -108,7 +138,7 @@ def map_pt(index, args_map: Args_Map_PT):
     NUM_CLASSES = args_map.num_classes
     DATASET_PATH = f"datasets/{DATASET_NAME}/base"
     OUTPUT_PATH = f"checkpoints/{DATASET_NAME}/model"
-
+    LOG_MODULUS = args.log_modulus
 
     #acquire tpu device
    
@@ -172,7 +202,7 @@ def map_pt(index, args_map: Args_Map_PT):
 
     model:torch.nn.Module = BertForCounterfactualRobustness.from_pretrained('bert-base-uncased', num_labels=NUM_CLASSES).to(device)  # type: ignore
     # pjrt.broadcast_master_param(model)
-    model = DDP(model) 
+    model = DDP(model, gradient_as_bucket_view=True, broadcast_buffers=True) 
     # if xm.get_ordinal() == 0:
       # pjrt.broadcast_master_param(model)
     #   xm.rendezvous('broadcast_parameters')
@@ -188,20 +218,21 @@ def map_pt(index, args_map: Args_Map_PT):
     # scheduler = get_linear_schedule_with_warmup(optim, num_warmup_steps=50, num_training_steps=len(train_loader)*EPOCH_NUM)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode='min', factor=0.5, patience=3, verbose=True)
     warmup = get_constant_schedule_with_warmup(optim, num_warmup_steps=int(len(train_loader)*0.10))
-    steps = 0
     best_acc = 0
     best_epoch = -1
-    all_loss = []
 
 
-    return
+
+
+
     for epoch in range(EPOCH_NUM):
       train_metrics: MulticlassAccuracy  = MulticlassAccuracy(num_classes=args_map.num_classes).to(device)
       valid_metrics: MulticlassAccuracy = MulticlassAccuracy(num_classes=args_map.num_classes).to(device)
       model.train() # switch to training mode
-      train_progress_bar = tqdm(train_loader)
-
-      for batch in train_progress_bar:
+      # train_progress_bar = tqdm(train_loader)
+      tracker = xm.RateTracker()
+      for step, batch in enumerate(train_loader):
+        
         optim.zero_grad()
         
         input_ids = batch['input_ids'].to(device, dtype=torch.long)
@@ -227,26 +258,26 @@ def map_pt(index, args_map: Args_Map_PT):
 
         
         _, pred_labels_idx = logits.max(dim=1)
-
         _, true_labels_idx = true_labels.max(dim=1)
+
+
 
         train_metrics.update(pred_labels_idx, true_labels_idx)
 
 
         loss.sum().backward()
-        # epoch_loss.append(loss.sum())
-        train_progress_bar.set_description("Epoch train_accuracy %f" % train_metrics.compute().item())
 
 
         xm.optimizer_step(optim)
-
         warmup.step()
-        xm.mark_step()
-        # scheduler.step()
-        steps+=1
 
-      # all_loss.append(epoch_loss)
-      model.eval()# setting model to evaluation mode
+        if step % LOG_MODULUS == 0:
+          xm.add_step_closure(print_training_update, args=(device, step, loss, tracker, epoch))
+
+
+      
+
+      model.eval()
 
 
 
@@ -272,10 +303,10 @@ def map_pt(index, args_map: Args_Map_PT):
           val_loss += loss.sum()
           _, pred_labels_idx = logits.max(dim=1)
           _, true_labels_idx = true_labels.max(dim=1)
-          # print("Preds:",pred_labels_idx)
-          # print("Trues:",true_labels_idx)
           valid_metrics.update(pred_labels_idx, true_labels_idx)
-  
+
+
+
         accuracy = valid_metrics.compute().item()
       if accuracy >= best_acc:
         best_epoch = epoch
@@ -321,15 +352,15 @@ def map_pt(index, args_map: Args_Map_PT):
 def pretrainBERT(
   args: Args_PT,
 ):
-  os.environ['XRT_TPU_CONFIG'] = 'localservice;0;localhost:51011'
-  os.environ['MASTER_ADDR'] = 'localhost'
-  os.environ['MASTER_PORT'] = '12355'
-  # os.environ['PJRT_DEVICE'] = 'TPU'
+  # os.environ['XRT_TPU_CONFIG'] = 'localservice;0;localhost:51011'
+  # os.environ['MASTER_ADDR'] = 'localhost'
+  # os.environ['MASTER_PORT'] = '12355'
+  os.environ['PJRT_DEVICE'] = 'TPU'
 
   print(f"My name is {__name__}")
 
 
-  if pjrt.using_pjrt():
+  if xm.pjrt.using_pjrt():
     print("pjrt: enabled")
   else:
     print("pjrt: disabled")

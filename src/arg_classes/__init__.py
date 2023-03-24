@@ -9,14 +9,14 @@ class Args_PT():
   use_wandb: bool
   num_workers:int
 
-  def __init__(self, dataset_name, batch_size, epoch_num, use_pinned_memory, use_wandb, num_workers = 4):
+  def __init__(self, dataset_name, batch_size, epoch_num, use_pinned_memory, use_wandb, num_workers = 4, log_modulus = 20):
     self.dataset_name = dataset_name
     self.batch_size = batch_size
     self.epoch_num = epoch_num
     self.use_pinned_memory = use_pinned_memory
     self.use_wandb = use_wandb
     self.num_workers = num_workers
-
+    self.log_modulus = log_modulus
 
 class Args_Map_PT():
 
