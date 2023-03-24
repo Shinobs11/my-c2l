@@ -39,6 +39,18 @@ def test_fn(index, args):
   log.info(f"Result tensor: {res_tensor}")
 
 
+  test_tensor = torch.tensor([1,2,3,4,5]).to(device)
+
+  if xm.get_ordinal() == 0:
+    test_tensor = torch.tensor([5, 4, 3, 2, 1]).to(device)
+  
+
+  xm.collective_broadcast([test_tensor])
+  xm.mark_step()
+  
+  print(f"index: {index}, test_tensor: {test_tensor}")
+
+
 if __name__ == '__main__':
   os.environ['XRT_TPU_CONFIG'] = 'localservice;0;localhost:51011'
   os.environ['MASTER_ADDR'] = 'localhost'

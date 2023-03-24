@@ -18,7 +18,7 @@ import wandb
 import wandb.util as wbutil
 import random
 
-# from src.arg_classes import Args_PT
+from src.arg_classes import Args_PT
 
 
 
@@ -29,7 +29,7 @@ import random
 # else:
 #   os.environ['PJRT_DEVICE'] = 'CPU'
 # os.environ['PJRT_DEVICE'] = 'TPU'
-# os.environ['TOKENIZERS_PARALLELISM'] = "false"
+os.environ['TOKENIZERS_PARALLELISM'] = "false"
 # os.environ['XRT_TPU_CONFIG'] = 'localservice;0;localhost:51011'
 # os.environ['MASTER_ADDR'] = 'localhost'
 # os.environ['MASTER_PORT'] = '12355'
@@ -66,12 +66,17 @@ def main():
     #     use_wandb=False
     # )
 
-    pretrainBERT(
+    args_pt = Args_PT(
         dataset_name=dataset_name,
         batch_size = 8,
         epoch_num = 20,
         use_pinned_memory=False,
-        use_wandb=False
+        use_wandb=False,
+        num_workers=4)
+
+
+    pretrainBERT(
+      args_pt
     )
     # wandb.finish()
 
