@@ -1,4 +1,4 @@
-import json, os, pickle, torch, logging, typing, numpy as np, glob, argparse
+import json, os, pickle, torch, logging, typing, numpy as np, glob, argparse, pandas as pd
 from torch.utils.data import DataLoader, Dataset
 from pathlib import Path
 from tqdm import tqdm
@@ -12,14 +12,10 @@ from  src.classes.datasets import ClassificationDataset
 
 
 
+from torch import amp
 
 import pickle
 
-from torch.nn.parallel import DistributedDataParallel as DDP
-import torch.distributed as dist
-import torch_xla.core.xla_model as xm
-import torch_xla.distributed.xla_multiprocessing as xmp
-import torch_xla.distributed.parallel_loader as pl
 
 from typing import Tuple, List, Union
 import json, psutil
@@ -27,10 +23,14 @@ import json, psutil
 from torchmetrics import MetricCollection
 from torchmetrics.classification import MulticlassAccuracy
 import wandb
+from torch.cuda.amp.autocast_mode import autocast
+
 torch.manual_seed(0)
-
-
-
+import numpy as np
+np.random.seed(0)
+import random
+random.seed(0)
+# torch.use_deterministic_algorithms(True)
 
 def pretrainBERT(
   dataset_name: str,
@@ -65,6 +65,9 @@ def pretrainBERT(
 
     tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
     train_set = pload(os.path.join(DATASET_PATH, "train_set"))
+
+    
+
     train_labels:list = train_set['label'].tolist()
     train_texts:list[str] = train_set['text'].tolist()
     
@@ -86,6 +89,7 @@ def pretrainBERT(
     tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
 
     valid_set = pload(os.path.join(DATASET_PATH, "valid_set"))
+
     valid_texts:list[str] = valid_set['text'].tolist()
     valid_labels: list = valid_set['label'].tolist()
     valid_encodings = tokenizer(valid_texts, padding=True, truncation=True)
@@ -107,47 +111,45 @@ def pretrainBERT(
 
     
 
-    # device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    
-    device = xm.xla_device()
-    dist.init_process_group('xla', init_method='pjrt://')
-    if os.path.exists(os.path.join(DATASET_PATH, "trainLoader.pickle.blosc")):
-      train_loader: Union[DataLoader, pl.MpDeviceLoader] = pload(os.path.join(DATASET_PATH, "trainLoader"))
-    else:
-      train_loader: Union[DataLoader, pl.MpDeviceLoader]  = loadTrainData()
-    if os.path.exists(os.path.join(DATASET_PATH, "validLoader.pickle.blosc")):
-      valid_loader: Union[DataLoader, pl.MpDeviceLoader]  = pload(os.path.join(DATASET_PATH, "validLoader"))
-    else:
-      valid_loader: Union[DataLoader, pl.MpDeviceLoader]  = loadValData()
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    if torch.cuda.is_available():
+      torch.cuda.empty_cache()
     
 
-    train_loader = pl.MpDeviceLoader(train_loader, device)
-    valid_loader = pl.MpDeviceLoader(valid_loader, device)
+    if os.path.exists(os.path.join(DATASET_PATH, "trainLoader.pickle.blosc")):
+      train_loader: DataLoader = pload(os.path.join(DATASET_PATH, "trainLoader"))
+    else:
+      train_loader: DataLoader  = loadTrainData()
+    if os.path.exists(os.path.join(DATASET_PATH, "validLoader.pickle.blosc")):
+      valid_loader: DataLoader  = pload(os.path.join(DATASET_PATH, "validLoader"))
+    else:
+      valid_loader: DataLoader  = loadValData()
+    
+
+
 
 
     num_classes = -1
     if len(train_loader.dataset[0]["label"].shape) == 1: #type:ignore
       num_classes = train_loader.dataset[0]["label"].shape[0] #type:ignore
+    elif len(train_loader.dataset[0]["label"].shape) == 2: #type:ignore
+      num_classes = train_loader.dataset[0]["label"].shape[1]
     else:
       s = set()
-      [s.add(x["labels"]) for x in train_loader.dataset] #type:ignore
+      [s.add(x["label"]) for x in train_loader.dataset] #type:ignore
       num_classes = len(s)
 
 
 
     torch.cuda.empty_cache()
     model:torch.nn.Module = BertForCounterfactualRobustness.from_pretrained('bert-base-uncased', num_labels=num_classes)  # type: ignore
-    model = DDP(model, gradient_as_bucket_view=True)
-    # model = torch.compile(model) #type: ignore
-    # model:torch.nn.Module = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=num_classes) #type: ignore  
-    # model:torch.nn.Module = torch.compile(model) #type: ignore
-    # model:BertForSequenceClassification = torch.nn.DataParallel(model)  # type: ignore # ! only use with distributed computing
+    model = torch.compile(model) #type: ignore
     model.to(device)
 
     optim = torch.optim.AdamW(model.parameters(), lr=5e-5)
     # scheduler = get_linear_schedule_with_warmup(optim, num_warmup_steps=50, num_training_steps=len(train_loader)*EPOCH_NUM)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode='min', factor=0.5, patience=3, verbose=True)
-    warmup = get_constant_schedule_with_warmup(optim, num_warmup_steps=int(len(train_loader)*0.10))
+    warmup = get_constant_schedule_with_warmup(optim, num_warmup_steps=int(len(train_loader)*0.2))
     steps = 0
     best_acc = 0
     best_epoch = -1
@@ -164,33 +166,37 @@ def pretrainBERT(
       for batch in train_progress_bar:
         optim.zero_grad()
         
-        input_ids = batch['input_ids'].to(device, dtype=torch.long)
-        attention_mask = batch['attention_mask'].to(device, dtype=torch.long)
-        token_type_ids = batch['token_type_ids'].to(device, dtype=torch.long)
+        input_ids = batch['input_ids'].to(device, dtype=torch.int)
+        attention_mask = batch['attention_mask'].to(device, dtype=torch.int)
+        token_type_ids = batch['token_type_ids'].to(device, dtype=torch.int)
         labels = batch['label'].to(device)
+
+        # labels = torch.argmax(labels, dim=1)
         true_labels = labels #shape = [n_labels]
-        _, labels = torch.max(labels, dim = 1)  
+
+    
 
 
-        outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model(
-          anchor_input_ids=input_ids,
-          anchor_attention_mask=attention_mask,
-          anchor_token_type_ids=token_type_ids,
-          labels=labels,
-          return_dict=True
-        )
-        assert isinstance(outputs, SequenceClassifierOutput)
+        with autocast(dtype=torch.bfloat16):
+          outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model(
+            anchor_input_ids=input_ids,
+            anchor_attention_mask=attention_mask,
+            anchor_token_type_ids=token_type_ids,
+            labels=labels,
+            return_dict=True
+          )
+          assert isinstance(outputs, SequenceClassifierOutput)
 
 
-        loss:torch.Tensor = outputs['loss']
-        logits:torch.Tensor = outputs['logits']
+          loss:torch.Tensor = outputs['loss']
+          logits:torch.Tensor = outputs['logits']
 
         
-        _, pred_labels_idx = logits.max(dim=1)
+          _, pred_labels_idx = logits.max(dim=1)
 
-        _, true_labels_idx = true_labels.max(dim=1)
+          _, true_labels_idx = true_labels.max(dim=1)
 
-        train_metrics.update(pred_labels_idx, true_labels_idx)
+          train_metrics.update(pred_labels_idx, true_labels_idx)
 
 
         loss.sum().backward()
@@ -198,7 +204,6 @@ def pretrainBERT(
         train_progress_bar.set_description("Epoch train_accuracy %f" % train_metrics.compute().item())
         optim.step()
         warmup.step()
-        xm.mark_step()
         # scheduler.step()
         steps+=1
 
@@ -216,6 +221,8 @@ def pretrainBERT(
           attention_mask = batch['attention_mask'].to(device, dtype=torch.long)
           token_type_ids = batch['token_type_ids'].to(device, dtype=torch.long)
           true_labels = batch['label'].to(device)
+
+
           outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model(
             labels=true_labels,
             anchor_input_ids=input_ids,
@@ -260,7 +267,7 @@ def pretrainBERT(
       pass
 
 
-  # xmp.spawn(pretrainModel)
+
   pretrainModel()
 
 

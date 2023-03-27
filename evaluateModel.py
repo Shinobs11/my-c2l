@@ -53,7 +53,7 @@ def evaluateModel(
 
   def loadTestData():
     tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
-    test_set = pload(os.path.join(DATASET_PATH, 'valid_set'))
+    test_set = pload(os.path.join(DATASET_PATH, 'test_set'))
     test_texts = test_set['text'].tolist()
     test_labels = test_set['label'].tolist()
     test_encodings = tokenizer(test_texts, padding=True, truncation=True)
@@ -80,6 +80,7 @@ def evaluateModel(
 
   torch.cuda.empty_cache()
   model: torch.nn.Module = BertForCounterfactualRobustness.from_pretrained(os.path.join(MODEL_PATH, "best_epoch"), num_labels=num_labels) #type:ignore
+  model: torch.nn.Module = torch.compile(model) #type:ignore
   model.eval()
   model.to(device)
 

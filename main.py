@@ -3,8 +3,8 @@ from preTraining import pretrainBERT
 from generateTriplets import generateTiplets
 from contrastiveLearning import constrastiveTrain
 from evaluateModel import evaluateModel
-import torch_xla.core.xla_model as xm
 
+# torch.use_deterministic_algorithms(True)
 torch.manual_seed(0)
 import numpy as np
 np.random.seed(0)
@@ -12,12 +12,6 @@ import random
 random.seed(0)
 
 
-if torch.cuda.is_available():
-  os.environ['PJRT_DEVICE'] = 'GPU'
-elif xm.get_xla_supported_devices('TPU') is not None:
-  os.environ['PJRT_DEVICE'] = 'TPU'
-else:
-  os.environ['PJRT_DEVICE'] = 'CPU'
 
 parser = argparse.ArgumentParser(
   usage="python3 main.py [options...]",

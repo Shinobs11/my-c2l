@@ -4,8 +4,6 @@ from preTraining import pretrainBERT
 from evaluateModel import evaluateModel
 from contrastiveLearning import constrastiveTrain
 from generateTriplets import generateTiplets
-import torch_xla.core.xla_model as xm
-import torch_xla.distributed.xla_multiprocessing as xmp
 import torch
 torch.manual_seed(0)
 import numpy as np
@@ -17,23 +15,20 @@ import wandb
 import wandb.util as wbutil
 import random
 
-# if torch.cuda.is_available():
-#   os.environ['PJRT_DEVICE'] = 'GPU'
-# elif xm.get_xla_supported_devices('TPU') is not None:
-#   os.environ['PJRT_DEVICE'] = 'TPU'
-# else:
-#   os.environ['PJRT_DEVICE'] = 'CPU'
-os.environ['PJRT_DEVICE'] = 'TPU'
+
+
+torch.set_float32_matmul_precision('high')
+torch.backends.cuda.matmul.allow_tf32 = True
 os.environ['TOKENIZERS_PARALLELISM'] = "false"
 
 def main():
 
-    dataset_name = "yelp_nyc"
-    experiment_id = f"{dataset_name}-experiment-{wbutil.generate_id()}"
-
+  dataset_name = "yelp_zip"
+  # experiment_id = f"{dataset_name}-experiment-{wbutil.generate_id()}"
+  experiment_id = f"{dataset_name}_full_run_0"
     #pretrain
   
-
+  def pt():
     wandb.init(
         project="my-c2l",
         group=experiment_id,
@@ -41,23 +36,23 @@ def main():
         reinit=True,
         config={
           "dataset": dataset_name,
-          "batch_size_pt": 8,
-          "n_epochs_pt":20,
+          "batch_size_pt": 16,
+          "n_epochs_pt":16,
         }
         )
     
-    def map_pt(index):
-      pretrainBERT(
-          dataset_name=wandb.config.dataset,
-          batch_size=wandb.config.batch_size_pt,
-          epoch_num=wandb.config.n_epochs_pt,
-          use_pinned_memory=False
-      )
-    xmp.spawn(map_pt)
+    pretrainBERT(
+        dataset_name=wandb.config.dataset,
+        batch_size=wandb.config.batch_size_pt,
+        epoch_num=wandb.config.n_epochs_pt,
+        use_pinned_memory=False
+    )
     wandb.finish()
 
+  pt()
 
-    #triplets
+  def triplets():
+    # triplets
     wandb.init(
       project="my-c2l",
       group=experiment_id,
@@ -69,7 +64,7 @@ def main():
         "augment_ratio": 1,
         "dropout_ratio": 0.5,
         "topk_num": 4,
-        "max_masking_attempts": 0,
+        "max_masking_attempts": 50,
        }
     )
     generateTiplets(
@@ -83,8 +78,13 @@ def main():
     )
     wandb.finish()
 
-    #contrastive training
+  triplets()
 
+
+
+
+  #   #contrastive training
+  def cl():
     wandb.init(
        project="my-c2l",
         group=experiment_id,
@@ -92,8 +92,8 @@ def main():
         reinit=True,
         config={
        "dataset": dataset_name,
-        "batch_size_cl": 8,
-        "n_epochs_cl": 20,
+        "batch_size_cl": 2,
+        "n_epochs_cl": 16,
         "lambda_weight": 0.1,
        }
     )
@@ -105,7 +105,9 @@ def main():
     )
     wandb.finish()
 
-    #eval(pretrain)
+  cl()
+
+  def eval_pt():
     pretrain_eval_batch_size = 8
     pre_use_cl_model = False
     wandb.init(
@@ -124,7 +126,11 @@ def main():
         use_cl_model=pre_use_cl_model
     )
     wandb.finish()
-    #eval(cl)
+
+
+  eval_pt()
+
+  def eval_cl():
     cl_eval_batch_size = 8
     cl_use_cl_model = True
     wandb.init(
@@ -144,5 +150,6 @@ def main():
     )
     wandb.finish()
 
+  eval_cl()
 if __name__=="__main__":
     main()

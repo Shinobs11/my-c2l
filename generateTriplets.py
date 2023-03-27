@@ -14,6 +14,8 @@ from torch import Tensor
 import torch.linalg as lin
 import functorch
 import typing
+from torch.cuda.amp.autocast_mode import autocast
+# torch.use_deterministic_algorithms(True)
 torch.manual_seed(0)
 import numpy as np
 np.random.seed(0)
@@ -21,7 +23,6 @@ import random
 random.seed(0)
 from typing import Tuple, Union, List
 
-import torch_xla.core.xla_model as xm
 
 
 
@@ -39,7 +40,7 @@ def generateTiplets(
   DATASET_PATH = f"datasets/{DATASET_NAME}/base"
   OUTPUT_PATH = f"checkpoints/{DATASET_NAME}/model"
   TRIPLETS_PATH = f"datasets/{DATASET_NAME}/augmented_triplets"
-  
+  SAMPLE_PATH = f"samples/{DATASET_NAME}"
   #! convert these into arguments
   TOPK_NUM = topk_num
   DROPOUT_RATIO = dropout_ratio
@@ -47,15 +48,26 @@ def generateTiplets(
 
   import json
 
-
+  if torch.cuda.is_available():
+    torch.cuda.empty_cache()
   
+
+  if not os.path.exists(SAMPLE_PATH):
+    os.makedirs(SAMPLE_PATH)
+
+  json_file = open(os.path.join(SAMPLE_PATH, f"mask_candidate_sample.json"), mode='w')
+  token_idx_flip = open(os.path.join(SAMPLE_PATH, f"token_idx_flip.json"), mode='w')
+  
+
+
+
 
   tokenizer: T.BertTokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
   
   VOCAB_SIZE = tokenizer.vocab_size
 
-  # device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-  device = xm.xla_device()
+  device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
   train_set = pload(os.path.join(DATASET_PATH, "train_set"))
 
   train_texts = train_set["text"].tolist()
@@ -90,13 +102,14 @@ def generateTiplets(
 
   def compute_importances(data_loader:DataLoader) -> List[Tensor]:
     model:BertForSequenceClassification = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH, 'best_epoch'), output_hidden_states=True, num_labels=num_classes) #type:ignore
+    model:BertForSequenceClassification = torch.compile(model) #type:ignore
     model.to(device)
 
     def get_gradient_norms(batch):
       input_ids:Tensor = batch['input_ids'].to(device)
       attention_mask:Tensor = batch['attention_mask'].to(device)
       labels:Tensor = batch['label'].to(device)
-      labels = torch.argmax(labels, dim=1)
+      # labels = torch.argmax(labels, dim=1)
       token_len = input_ids.shape[1]
       importances = []
       for i in range(input_ids.shape[0]):
@@ -140,9 +153,9 @@ def generateTiplets(
     for importances, batch in tqdm(zip(all_importances, data_loader)):
       for importance, item in zip(importances, batch['input_ids'].to(device)):
         m = max(item) + 1
-        bincount = torch.bincount(item).to(device)
+        bincount = torch.bincount(item).to(device) #
         importance_count[0:m] += bincount
-        imp_bincount = item.bincount(importance)[0:m]*bincount[0:m]
+        imp_bincount = item.bincount(weights=importance[0:item.shape[-1]]) * bincount[0:m]
         importance_sum[0:m] += imp_bincount
       total_count += batch['input_ids'].shape[0]
     averaged_importances = importance_sum/importance_count
@@ -184,6 +197,7 @@ def generateTiplets(
   # exit()
 
   mlm_model: BertForMaskedLM = BertForMaskedLM.from_pretrained('bert-base-uncased') #type: ignore
+  mlm_model = torch.compile(mlm_model) #type: ignore
   mlm_model: BertForMaskedLM = mlm_model.to(device) #type: ignore
   mlm_model.eval()
 
@@ -200,19 +214,22 @@ def generateTiplets(
 
  
       tokens = torch.tensor([x for x in batch['input_ids'][0][1:] if x not in [tokenizer.sep_token_id, tokenizer.pad_token_id]]) # could this be done better?
-      # tokens = batch['input_ids']
-      # assert tokens.size() == importances.size()
-      
+
+
       orig_sample = tokenizer.decode(tokens,  clean_up_tokenization_spaces=True)
-      # print(orig_sample)
+
       causal_mask, err_flag, maximum_score = mask_causal_words(tokens, batch, importances[0])
-      # exit()
+
+
+
       no_flip_index.append(err_flag)
       if err_flag:
         no_flip_count += 1
 
+      label = batch['label'].squeeze()
+
       if 1 not in causal_mask:
-        triplets.append((batch['label'], orig_sample, orig_sample, orig_sample, err_flag, maximum_score))
+        triplets.append((label, orig_sample, orig_sample, orig_sample, err_flag, maximum_score))
         continue
 
 
@@ -247,7 +264,7 @@ def generateTiplets(
         # _, labels = torch.max(batch['labels'], dim=1)
     
 
-        triplets.append((batch['label'], orig_sample, causal_masked_sample, noncausal_masked_sample, err_flag, maximum_score))
+        triplets.append((label, orig_sample, causal_masked_sample, noncausal_masked_sample, err_flag, maximum_score))
     print(f"Error count: {error_count}")
     print(f"Flip count: {len(data_loader) - no_flip_count}")
 
@@ -259,10 +276,10 @@ def generateTiplets(
 
 
 
-  json_file = open(f"mask_candidate_sample_{dataset_name}.json", mode='w')
-  token_idx_flip = open(f"token_idx_flip_{DATASET_NAME}.json", mode='w')
+
   tokenizer: T.BertTokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
   model:BertForSequenceClassification = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH, 'best_epoch')) #type:ignore
+  model:BertForSequenceClassification = torch.compile(model) #type:ignore
   model.to(device)
   model.eval()
   def mask_causal_words(tokens:Tensor, batch:DataItem, importances: Tensor):
@@ -322,9 +339,10 @@ def generateTiplets(
       
       #get predicted words from mlm model given the partially missing embeds
       with torch.no_grad():
-        outputs = mlm_model(attention_mask = masked_attention_mask, token_type_ids = masked_token_type_ids, inputs_embeds = masked_input_embeds)
-        predictions = outputs[0] # 4 x 313 x 30522, just a casual 38 million numbers. shape(batch_size, sequence_length, config.vocab_size)
-      
+        with autocast(dtype=torch.bfloat16):
+          outputs = mlm_model(attention_mask = masked_attention_mask, token_type_ids = masked_token_type_ids, inputs_embeds = masked_input_embeds)
+          predictions = outputs[0] # 4 x 313 x 30522, just a casual 38 million numbers. shape(batch_size, sequence_length, config.vocab_size)
+        
       #search through and find top k logits, in this case 4. 
       topk_logit_indices = torch.topk(predictions, TOPK_NUM, dim=-1)[1] # 4 sequences x 313 tokens x 4 
 
@@ -336,7 +354,7 @@ def generateTiplets(
       #! Switching to this solution resulted in a 15% increase in performance.
       def select_mc(topk_logits: Tensor, importance_idx: Tensor):
         return topk_logits.index_select(0, importance_idx).squeeze(0)
-      batch_select_mc = functorch.vmap(select_mc)
+      batch_select_mc = torch.vmap(select_mc)
       mask_candidates = batch_select_mc(topk_logit_indices, importance_indices.add(1).unsqueeze(1))
 
 
@@ -348,9 +366,11 @@ def generateTiplets(
           recon_input_ids[i][importance_index + 1] = mc
         
         with torch.no_grad():
+          with autocast(dtype=torch.bfloat16):
           #largest performance hog is this area right here. roughly 45% of time is spent in this model
-          recon_outputs = model(recon_input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-          _, recon_prediction = torch.max(recon_outputs[0], dim=1)
+          
+            recon_outputs = model(recon_input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+            _, recon_prediction = torch.max(recon_outputs[0], dim=1)
 
 
 
@@ -427,6 +447,9 @@ def generateTiplets(
   with open(os.path.join(TRIPLETS_PATH, "augmented_triplets.json"), mode='w') as f:
     json.dump(triplets_json, f, indent=2)
 
+  from splitAugmentedSet import splitAugmentedSet
+
+  splitAugmentedSet(DATASET_NAME)
 
 
 

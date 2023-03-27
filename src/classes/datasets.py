@@ -39,11 +39,11 @@ class TripletGenDataset(Dataset):
     self.enumerate = enumerate
   def __getitem__(self, idx):
     item = {
-      'importance_indices': torch.tensor(self.importance[idx]),
+      'importance_indices': self.importance[idx].clone().detach(),
     }
 
 
-    item.update({k: torch.tensor(v[idx]) for k, v in self.encodings.items()})
+    item.update({k: v[idx].clone().detach() for k, v in self.encodings.items()})
 
     if (self.enumerate == True):
       return idx, item
