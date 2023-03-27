@@ -21,8 +21,6 @@ def _get_device_spec(device):
 def print_training_update(device,
                           step,
                           loss,
-                          rate,
-                          global_rate,
                           epoch=None):
   """Prints the training metrics at a given step.
 
@@ -40,7 +38,6 @@ def print_training_update(device,
       'Training', 'Device={}'.format(_get_device_spec(device)),
       'Epoch={}'.format(epoch) if epoch is not None else None,
       'Step={}'.format(step), 'Loss={:.5f}'.format(loss),
-      'Rate={:.2f}'.format(rate), 'GlobalRate={:.2f}'.format(global_rate),
       'Time={}'.format(now())
   ]
   print('|', ' '.join(item for item in update_data if item), flush=True)

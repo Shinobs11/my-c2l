@@ -1,44 +1,26 @@
-import os, pickle, torch, logging, typing, numpy as np, glob, argparse,  wandb, json, psutil
-from torch.utils.data import DataLoader, Dataset
-from pathlib import Path
-from tqdm import tqdm
-from transformers import BertTokenizerFast, BertForSequenceClassification, get_linear_schedule_with_warmup, get_constant_schedule_with_warmup
+import os, torch
+from transformers import BertTokenizerFast, get_constant_schedule_with_warmup
 from src.arg_classes import Args_Map_PT, Args_PT
-
 from src.utils.pickleUtils import pdump, pload
-from src.proecssing import correct_count
-from transformers.models.bert.modeling_bert import SequenceClassifierOutput
+from transformers.models.bert.modeling_bert import SequenceClassifierOutput 
 from src.classes.model import BertForCounterfactualRobustness
 from src.classes.datasets import ClassificationDataset
-from src.logging.logSetup import logSetup
-from src.arg_classes import Args_PT
+from torch.utils.data import DataLoader
 
-
-
-
-from torch.distributed.optim.zero_redundancy_optimizer import ZeroRedundancyOptimizer
-from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.distributed as dist
 import torch_xla.core.xla_model as xm
 import torch_xla.distributed.xla_multiprocessing as xmp
 import torch_xla.distributed.parallel_loader as pl
+from torch.distributed.optim.zero_redundancy_optimizer import ZeroRedundancyOptimizer
+from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data.distributed import DistributedSampler
 
 from typing import Tuple, List, Union
 
 
-# from torchmetrics import MetricCollection
-# from torchmetrics.classification import MulticlassAccuracy
-import torch_xla.core.xla_model as xm
-# import torch_xla.distributed.xla_backend
 import torch_xla.experimental.pjrt_backend
-torch.manual_seed(0)
+import torch_xla.experimental.pjrt as pjrt
 
-
-from src.logging import print_training_update, print_test_update
-from torch.utils.tensorboard.writer import SummaryWriter
-
-writer = SummaryWriter()
 
 
 def loadTrainData(dataset_path: str):
@@ -59,7 +41,7 @@ def loadTrainData(dataset_path: str):
 def loadValData(dataset_path: str):
   tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
 
-  valid_set = pload(os.path.join(dataset_path, "valid_set"))[0:256]
+  valid_set = pload(os.path.join(dataset_path, "valid_set"))
   valid_texts:list[str] = valid_set['text'].tolist()
   valid_labels: list = valid_set['label'].tolist()
   valid_encodings = tokenizer(valid_texts, padding=True, truncation=True)
@@ -71,21 +53,10 @@ def loadValData(dataset_path: str):
   return valid_dataset
 
 
-
-
-#TODOS: Rewrite as class or non-nested function, issue might be that function is pickled and transferred elsewhere
-#But if the function can't be pickled, then the function can't be transferred.
-
-
-
-
 def map_pt(index, args_map: Args_Map_PT):
   args = args_map.args_pt
   dist.init_process_group('xla', init_method='pjrt://')
-
-  rank = xm.get_ordinal()
-  world_size = xm.xrt_world_size()
-  # dist.init_process_group('xla', world_size=world_size, rank=rank)
+  # dist.init_process_group('xla', world_size=xm.xrt_world_size(), rank=xm.get_ordinal())
   device = xm.xla_device()
   print(f"Started process on index {index}")
 
@@ -189,10 +160,6 @@ def map_pt(index, args_map: Args_Map_PT):
   best_acc = 0
   best_epoch = -1
 
-
-
-
-
   for epoch in range(EPOCH_NUM):
     # train_metrics: MulticlassAccuracy  = MulticlassAccuracy(num_classes=args_map.num_classes).to(device)
     # valid_metrics: MulticlassAccuracy = MulticlassAccuracy(num_classes=args_map.num_classes).to(device)
@@ -208,10 +175,10 @@ def map_pt(index, args_map: Args_Map_PT):
       token_type_ids = batch['token_type_ids'].to(device, dtype=torch.long)
       labels = batch['label'].to(device)
       true_labels = labels #shape = [n_labels]
-      _, labels = torch.max(labels, dim = 1)  
 
 
-      outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model(
+
+      outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model.forward(
         anchor_input_ids=input_ids,
         anchor_attention_mask=attention_mask,
         anchor_token_type_ids=token_type_ids,
@@ -228,94 +195,20 @@ def map_pt(index, args_map: Args_Map_PT):
       _, pred_labels_idx = logits.max(dim=1)
       _, true_labels_idx = true_labels.max(dim=1)
 
+      print(f"step: {step}")
 
 
       # train_metrics.update(pred_labels_idx, true_labels_idx)
 
-
+      
       loss.sum().backward()
 
-
+      #* Somehwere in here is the AllReduce issue *
+      
       xm.optimizer_step(optim, pin_layout=False)
+      #* End here*
       warmup.step()
 
-      if step % LOG_MODULUS == 0:
-        xm.add_step_closure(print_training_update, args=(device, step, loss, epoch))
-        # xm.add_step_closure(print, args=(f"Hello world from index {index}"))
-        # print(f"Index: {index}\t Step: {step}")
-      
-
-    model.eval()
-
-
-
-    accuracy = 0.0
-    val_loss = 0.0
-    for batch in valid_loader:
-      with torch.no_grad():
-        # labels = batch['label'].to(device)
-        input_ids = batch['input_ids'].to(device, dtype=torch.long)
-        attention_mask = batch['attention_mask'].to(device, dtype=torch.long)
-        token_type_ids = batch['token_type_ids'].to(device, dtype=torch.long)
-        true_labels = batch['label'].to(device)
-        outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model(
-          labels=true_labels,
-          anchor_input_ids=input_ids,
-          anchor_attention_mask=attention_mask,
-          anchor_token_type_ids=token_type_ids,
-          return_dict=True
-        )
-        assert isinstance(outputs, SequenceClassifierOutput)
-        loss = outputs['loss']
-        logits = outputs['logits']
-        val_loss += loss.sum()
-        _, pred_labels_idx = logits.max(dim=1)
-        _, true_labels_idx = true_labels.max(dim=1)
-        # valid_metrics.update(pred_labels_idx, true_labels_idx)
-
-
-
-      # accuracy = valid_metrics.compute().item()
-    if accuracy >= best_acc:
-      best_epoch = epoch
-      best_acc = accuracy
-
-
-    xm.master_print(f"Accuracy: {accuracy}")
-    scheduler.step(val_loss)
-
-    if xm.is_master_ordinal():
-      if(USE_WANDB):
-        wandb.log({"valid accuracy": accuracy, "valid loss": val_loss})
-      model.save_pretrained(os.path.join(OUTPUT_PATH, f"epoch_{epoch}")) #type:ignore
-  # pdump(all_loss, os.path.join(OUTPUT_PATH,"training_loss"))
-  xm.master_print(f"\nBest model is epoch {best_epoch}.")
-  xm.master_print(f"\nBest accuracy is {best_acc}")
-
-  if xm.is_master_ordinal():
-    try:
-      for x in glob.glob(os.path.join(OUTPUT_PATH, "best_epoch", "*")):
-        os.remove(x)
-      os.rmdir(os.path.join(OUTPUT_PATH, "best_epoch"))
-    except:
-      pass
-    os.rename(os.path.join(OUTPUT_PATH, f"epoch_{best_epoch}"), os.path.join(OUTPUT_PATH, "best_epoch"))
-    try:
-      for x in glob.glob(os.path.join(OUTPUT_PATH, "epoch_*")):
-        for y in glob.glob(os.path.join(x, "*")):
-          os.remove(y)
-        os.rmdir(x)
-    except:
-      pass
-
-
-  
-
-
-
-
-
-  
 def pretrainBERT(
   args: Args_PT,
 ):
@@ -323,7 +216,7 @@ def pretrainBERT(
   # os.environ['MASTER_ADDR'] = 'localhost'
   # os.environ['MASTER_PORT'] = '12355'
   os.environ['PJRT_DEVICE'] = 'TPU'
-  # os.environ['XLA_USE_BF16'] = "1"
+  os.environ['XLA_USE_BF16'] = "1"
 
   print(f"My name is {__name__}")
 
@@ -370,13 +263,7 @@ def pretrainBERT(
   )
 
 
-  if(__name__ == "preTraining"):
+  if(__name__ == "preTrainingv2"):
     xmp.spawn(map_pt, args=(args_map,), start_method='spawn', join=True)
-    dist.destroy_process_group()
 
 
-
-
-# ### Configuring misc. stuff
-# from transformers import logging
-# logging.set_verbosity_error()

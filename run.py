@@ -1,9 +1,9 @@
-from torch import topk
 import wandb, os
 from preTraining import pretrainBERT
-from evaluateModel import evaluateModel 
-from contrastiveLearning import constrastiveTrain #TODOS: figure out why these imports break EVERYTHING
-from generateTriplets import generateTiplets
+# from preTrainingv2 import pretrainBERT
+# from evaluateModel import evaluateModel 
+# from contrastiveLearning import constrastiveTrain #TODOS: figure out why these imports break EVERYTHING
+# from generateTriplets import generateTiplets
 import torch_xla.core.xla_model as xm
 import torch_xla.distributed.xla_multiprocessing as xmp
 import torch
@@ -69,10 +69,13 @@ def main():
     args_pt = Args_PT(
         dataset_name=dataset_name,
         batch_size = 8,
-        epoch_num = 20,
+        epoch_num = 1,
         use_pinned_memory=False,
         use_wandb=False,
-        num_workers=4)
+        num_workers=4,
+        log_modulus=5
+        
+        )
 
 
     pretrainBERT(
@@ -108,7 +111,7 @@ def main():
     # wandb.finish()
 
     # #contrastive training
-
+    
     # wandb.init(
     #    project="my-c2l",
     #     group=experiment_id,
