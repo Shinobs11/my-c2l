@@ -9,8 +9,8 @@ import os
 
 #for CHI, review being fake is Y or 0, N or 1
 
-TRAIN_SIZE = 4000
-TEST_SIZE = 1000
+TRAIN_SIZE = 400
+TEST_SIZE = 100
 
 yelp_chi_train = pd.read_csv("datasets/yelp_chi/yelp_chi_train.csv", index_col = 0).reset_index(drop=True)[0:TRAIN_SIZE]
 yelp_chi_test = pd.read_csv("datasets/yelp_chi/yelp_chi_test.csv", index_col = 0).reset_index(drop=True)[0:TEST_SIZE]
@@ -46,16 +46,16 @@ yelp_zip_train["label"] = yelp_zip_train["label"].transform((lambda x: [0.0, 1.0
 yelp_zip_test["label"] = yelp_zip_test["label"].transform((lambda x: [0.0, 1.0] if x == 1 else [1.0, 0.0]))
 
 
-chi_train_set = yelp_chi_train.drop(yelp_chi_train.index[int(len(yelp_chi_train)*0.90):])
-chi_valid_set = yelp_chi_train.drop(yelp_chi_train.index[:int(len(yelp_chi_train)*0.90)])
+chi_train_set = yelp_chi_train.drop(yelp_chi_train.index[int(len(yelp_chi_train)*0.75):])
+chi_valid_set = yelp_chi_train.drop(yelp_chi_train.index[:int(len(yelp_chi_train)*0.75)])
 chi_test_set = yelp_chi_test
 
-nyc_train_set = yelp_nyc_train.drop(yelp_nyc_train.index[int(len(yelp_nyc_train)*0.90):])
-nyc_valid_set = yelp_nyc_train.drop(yelp_nyc_train.index[:int(len(yelp_nyc_train)*0.90)])
+nyc_train_set = yelp_nyc_train.drop(yelp_nyc_train.index[int(len(yelp_nyc_train)*0.75):])
+nyc_valid_set = yelp_nyc_train.drop(yelp_nyc_train.index[:int(len(yelp_nyc_train)*0.75)])
 nyc_test_set = yelp_nyc_test
 
-zip_train_set = yelp_zip_train.drop(yelp_zip_train.index[int(len(yelp_zip_train)*0.90):])
-zip_valid_set = yelp_zip_train.drop(yelp_zip_train.index[:int(len(yelp_zip_train)*0.90)])
+zip_train_set = yelp_zip_train.drop(yelp_zip_train.index[int(len(yelp_zip_train)*0.75):])
+zip_valid_set = yelp_zip_train.drop(yelp_zip_train.index[:int(len(yelp_zip_train)*0.75)])
 zip_test_set = yelp_zip_test
 
 

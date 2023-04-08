@@ -1,36 +1,37 @@
-import json, os, pickle, torch, logging, typing, numpy as np, glob, argparse, pandas as pd
-from torch.utils.data import DataLoader, Dataset
-from pathlib import Path
-from tqdm import tqdm
-from transformers import BertTokenizerFast, BertForSequenceClassification, get_linear_schedule_with_warmup, get_constant_schedule_with_warmup
-
-from src.utils.pickleUtils import pdump, pload
-from src.proecssing import correct_count
-from transformers.models.bert.modeling_bert import SequenceClassifierOutput
-from src.classes.model import BertForCounterfactualRobustness
-from  src.classes.datasets import ClassificationDataset
-
-
-
-from torch import amp
-
+import argparse
+import gc
+import glob
+import json
+import logging
+import os
 import pickle
+import typing
+from pathlib import Path
+from typing import List, Tuple, Union
 
-
-from typing import Tuple, List, Union
-import json, psutil
-
+import numpy as np
+import pandas as pd
+import psutil
+import torch
+from torch import amp
+from torch.cuda.amp.autocast_mode import autocast
+from torch.utils.data import DataLoader, Dataset
 from torchmetrics import MetricCollection
 from torchmetrics.classification import MulticlassAccuracy
+from tqdm import tqdm
+from transformers import (BertForSequenceClassification, BertTokenizerFast,
+                          get_constant_schedule_with_warmup,
+                          get_linear_schedule_with_warmup)
+from transformers.models.bert.modeling_bert import SequenceClassifierOutput
+from src.logging.logSetup import mainLogger
 import wandb
-from torch.cuda.amp.autocast_mode import autocast
+from src.classes.datasets import ClassificationDataset
+from src.classes.model import BertForCounterfactualRobustness
+from src.logging import log_memory
+from src.proecssing import correct_count
+from src.utils.pickleUtils import pdump, pload
 
-torch.manual_seed(0)
-import numpy as np
-np.random.seed(0)
-import random
-random.seed(0)
-# torch.use_deterministic_algorithms(True)
+
 
 def pretrainBERT(
   dataset_name: str,
@@ -49,33 +50,19 @@ def pretrainBERT(
   OUTPUT_PATH = f"checkpoints/{DATASET_NAME}/model"
 
 
+  LOG_MEMORY_PATH = "logs/memory_log"
 
-
-
-
-# memAvailable = psutil.virtual_memory().available
-# estimatedMemConsumed = os.path.getsize(os.path.join(DATASET_PATH, "train_set.pickle.blosc")) * 3
-# USE_PINNED_MEMORY = True if (args.use_pinned_memory & (memAvailable > estimatedMemConsumed)) == 1 else False
-
+  log_memory(LOG_MEMORY_PATH, "pt_before.json")
 
 
 
   def loadTrainData():
-
-
     tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
     train_set = pload(os.path.join(DATASET_PATH, "train_set"))
-
-    
-
     train_labels:list = train_set['label'].tolist()
     train_texts:list[str] = train_set['text'].tolist()
-    
-
-    
     train_encodings = tokenizer(train_texts, padding=True, truncation=True)
     pdump(train_encodings, os.path.join(DATASET_PATH, "train_encodings"))
-    
     train_dataset = ClassificationDataset(labels=train_labels, encodings=train_encodings)
     train_loader = DataLoader(
       train_dataset,
@@ -83,18 +70,18 @@ def pretrainBERT(
       shuffle=False, #TODOS: test impact of shuffle
       pin_memory=use_pinned_memory
       )
+    
+    del tokenizer
+    del train_set
     return train_loader
 
   def loadValData():
     tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
-
     valid_set = pload(os.path.join(DATASET_PATH, "valid_set"))
-
     valid_texts:list[str] = valid_set['text'].tolist()
     valid_labels: list = valid_set['label'].tolist()
     valid_encodings = tokenizer(valid_texts, padding=True, truncation=True)
     pdump(valid_encodings, os.path.join(DATASET_PATH, "valid_encodings"))
-
     valid_dataset = ClassificationDataset(labels=valid_labels, encodings=valid_encodings)
     valid_loader = DataLoader(
       valid_dataset,
@@ -102,13 +89,22 @@ def pretrainBERT(
       shuffle=False,
       pin_memory=use_pinned_memory
     )
-
+    del tokenizer
+    del valid_set
     return valid_loader
 
 
 
   def pretrainModel():
+    torch.manual_seed(0)
+    import numpy as np
 
+    np.random.seed(0)
+    import random
+
+    random.seed(0)
+    torch.cuda.manual_seed_all(0)
+    torch.use_deterministic_algorithms(True)
     
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -139,25 +135,23 @@ def pretrainBERT(
       [s.add(x["label"]) for x in train_loader.dataset] #type:ignore
       num_classes = len(s)
 
-
+    mainLogger.info(f"pt_num_classes: {num_classes}")
 
     torch.cuda.empty_cache()
-    model:torch.nn.Module = BertForCounterfactualRobustness.from_pretrained('bert-base-uncased', num_labels=num_classes)  # type: ignore
-    model = torch.compile(model) #type: ignore
-    model.to(device)
-
+    model:torch.nn.Module = BertForCounterfactualRobustness.from_pretrained('bert-base-uncased', num_labels=num_classes).to(device)  # type: ignore
+    # model = torch.compile(model) #type: ignore
     optim = torch.optim.AdamW(model.parameters(), lr=5e-5)
     # scheduler = get_linear_schedule_with_warmup(optim, num_warmup_steps=50, num_training_steps=len(train_loader)*EPOCH_NUM)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode='min', factor=0.5, patience=3, verbose=True)
-    warmup = get_constant_schedule_with_warmup(optim, num_warmup_steps=int(len(train_loader)*0.2))
+    warmup = get_constant_schedule_with_warmup(optim, num_warmup_steps=int(len(train_loader)*0.25))
     steps = 0
     best_acc = 0
     best_epoch = -1
-    all_loss = []
 
-
+    cumulative_train_loss = 0.0
 
     for epoch in range(EPOCH_NUM):
+      epoch_train_loss = 0.0
       train_metrics: MulticlassAccuracy  = MulticlassAccuracy(num_classes=num_classes).to(device)
       valid_metrics: MulticlassAccuracy = MulticlassAccuracy(num_classes=num_classes).to(device)
       model.train() # switch to training mode
@@ -176,37 +170,38 @@ def pretrainBERT(
 
     
 
-
-        with autocast(dtype=torch.bfloat16):
-          outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model(
-            anchor_input_ids=input_ids,
-            anchor_attention_mask=attention_mask,
-            anchor_token_type_ids=token_type_ids,
-            labels=labels,
-            return_dict=True
-          )
-          assert isinstance(outputs, SequenceClassifierOutput)
+        outputs:Union[SequenceClassifierOutput, Tuple[torch.Tensor]] = model(
+          anchor_input_ids=input_ids,
+          anchor_attention_mask=attention_mask,
+          anchor_token_type_ids=token_type_ids,
+          labels=labels,
+          return_dict=True
+        )
+        assert isinstance(outputs, SequenceClassifierOutput)
 
 
-          loss:torch.Tensor = outputs['loss']
-          logits:torch.Tensor = outputs['logits']
+        loss:torch.Tensor = outputs['loss']
+        logits:torch.Tensor = outputs['logits']
 
+      
+        _, pred_labels_idx = logits.max(dim=1)
+
+        _, true_labels_idx = true_labels.max(dim=1)
+
+        train_metrics.update(pred_labels_idx, true_labels_idx)
+
+        training_loss = loss.sum()
+        epoch_train_loss += training_loss
+        training_loss.backward()
         
-          _, pred_labels_idx = logits.max(dim=1)
-
-          _, true_labels_idx = true_labels.max(dim=1)
-
-          train_metrics.update(pred_labels_idx, true_labels_idx)
-
-
-        loss.sum().backward()
-        # epoch_loss.append(loss.sum())
+        
+        
         train_progress_bar.set_description("Epoch train_accuracy %f" % train_metrics.compute().item())
         optim.step()
         warmup.step()
         # scheduler.step()
         steps+=1
-
+      cumulative_train_loss+= epoch_train_loss
       # all_loss.append(epoch_loss)
       model.eval()# setting model to evaluation mode
 
@@ -236,19 +231,25 @@ def pretrainBERT(
           val_loss += loss.sum()
           _, pred_labels_idx = logits.max(dim=1)
           _, true_labels_idx = true_labels.max(dim=1)
-          # print("Preds:",pred_labels_idx)
-          # print("Trues:",true_labels_idx)
           valid_metrics.update(pred_labels_idx, true_labels_idx)
-  
         accuracy = valid_metrics.compute().item()
+  
+      scheduler.step(val_loss)
+      wandb.log({
+        "base_valid_accuracy": accuracy,
+        "base_valid_loss": val_loss,
+        "base_cumulative_train_loss": cumulative_train_loss,
+        "base_epoch_train_loss": epoch_train_loss,
+        "base_epoch_train_accuracy": train_metrics.compute().item()
+        })
+
       if accuracy >= best_acc:
         best_epoch = epoch
         best_acc = accuracy
       print(f"Accuracy: {accuracy}")
-      scheduler.step(val_loss)
-      wandb.log({"valid accuracy": accuracy, "valid loss": val_loss})
+      
+      
       model.save_pretrained(os.path.join(OUTPUT_PATH, f"epoch_{epoch}")) #type:ignore
-    pdump(all_loss, os.path.join(OUTPUT_PATH,"training_loss"))
     print(f"\nBest model is epoch {best_epoch}.")
     print(f"\nBest accuracy is {best_acc}")
     try:
@@ -265,8 +266,18 @@ def pretrainBERT(
         os.rmdir(x)
     except:
       pass
+  
 
-
+    # * Clean up memory to prevent OOM errors on next run *
+    import torch._dynamo as dyn
+    log_memory(LOG_MEMORY_PATH, "pt_after.json")
+    dyn.reset()
+    del model, scheduler, optim, warmup
+    dyn.reset()
+    gc.collect()
+    torch.cuda.empty_cache()
+        
+      
 
   pretrainModel()
 
@@ -275,4 +286,5 @@ def pretrainBERT(
 
 ### Configuring misc. stuff
 from transformers import logging
+
 logging.set_verbosity_error()

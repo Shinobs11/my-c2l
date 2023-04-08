@@ -1,5 +1,5 @@
 from ast import Mult
-import json, os, pickle, torch, logging, typing, numpy as np, glob, argparse, wandb
+import json, os, pickle,gc, torch, logging, typing, numpy as np, glob, argparse, wandb
 from torch.utils.data import DataLoader, Dataset
 from transformers import BertTokenizerFast, BertForSequenceClassification
 from transformers.models.bert.modeling_bert import SequenceClassifierOutput
@@ -19,7 +19,8 @@ import numpy as np
 np.random.seed(0)
 import random
 random.seed(0)
-
+torch.cuda.manual_seed_all(0)
+torch.use_deterministic_algorithms(True)
 
 
 log_path = os.path.join(os.path.split(str(__file__))[0], "logs", "eval")
@@ -80,7 +81,7 @@ def evaluateModel(
 
   torch.cuda.empty_cache()
   model: torch.nn.Module = BertForCounterfactualRobustness.from_pretrained(os.path.join(MODEL_PATH, "best_epoch"), num_labels=num_labels) #type:ignore
-  model: torch.nn.Module = torch.compile(model) #type:ignore
+  # model: torch.nn.Module = torch.compile(model) #type:ignore
   model.eval()
   model.to(device)
 
@@ -124,7 +125,15 @@ def evaluateModel(
 
   model_type = "cl" if use_cl_model else "base"
   accuracy = metrics.compute()["accuracy"].item()
-  wandb.log({"eval accuracy": accuracy})
+  wandb.log({f"{model_type}_eval_accuracy": accuracy})
 
   info_logger.info(f"{model_type} model evaluation accuracy: {accuracy}")
   mainLogger.info(f"{model_type} model evaluation accuracy: {accuracy}")
+  
+  # * Clean up memory to prevent OOM errors on next run *
+  import torch._dynamo as dyn
+  dyn.reset()
+  del model, metrics
+  dyn.reset()
+  gc.collect()
+  torch.cuda.empty_cache()

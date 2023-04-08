@@ -1,10 +1,9 @@
-import json, os, pickle, torch, logging, typing, numpy as np, pandas as pd, wandb
+import json, os, pickle, torch, logging,gc,  typing, numpy as np, pandas as pd, wandb
 from torch.utils.data import DataLoader, Dataset
 from pathlib import Path
 from tqdm import tqdm
-from transformers import BertTokenizer, BertForMaskedLM, BertForSequenceClassification, AdamW, get_linear_schedule_with_warmup
+from transformers import BertTokenizer, BertForMaskedLM, BertForSequenceClassification
 import transformers as T
-from logging.handlers import RotatingFileHandler
 from src.utils.pickleUtils import pdump, pload, pjoin
 
 from src.proecssing import correct_count
@@ -15,14 +14,15 @@ import torch.linalg as lin
 import functorch
 import typing
 from torch.cuda.amp.autocast_mode import autocast
-# torch.use_deterministic_algorithms(True)
+from typing import Tuple, Union, List
+
+torch.use_deterministic_algorithms(True)
 torch.manual_seed(0)
 import numpy as np
 np.random.seed(0)
 import random
 random.seed(0)
-from typing import Tuple, Union, List
-
+torch.cuda.manual_seed_all(0)
 
 
 
@@ -101,9 +101,8 @@ def generateTiplets(
   
 
   def compute_importances(data_loader:DataLoader) -> List[Tensor]:
-    model:BertForSequenceClassification = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH, 'best_epoch'), output_hidden_states=True, num_labels=num_classes) #type:ignore
-    model:BertForSequenceClassification = torch.compile(model) #type:ignore
-    model.to(device)
+    model:BertForSequenceClassification = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH, 'best_epoch'), output_hidden_states=True, num_labels=num_classes).to(device) #type:ignore
+    # model:BertForSequenceClassification = torch.compile(model) #type:ignore
 
     def get_gradient_norms(batch):
       input_ids:Tensor = batch['input_ids'].to(device)
@@ -197,10 +196,11 @@ def generateTiplets(
   # exit()
 
   mlm_model: BertForMaskedLM = BertForMaskedLM.from_pretrained('bert-base-uncased') #type: ignore
-  mlm_model = torch.compile(mlm_model) #type: ignore
+  # mlm_model = torch.compile(mlm_model) #type: ignore
   mlm_model: BertForMaskedLM = mlm_model.to(device) #type: ignore
   mlm_model.eval()
-
+  
+  @torch.inference_mode()
   def mask_data(data_loader:DataLoader, all_importances: typing.List[Tensor], sampling_ratio, augment_ratio):
     triplets = []
     error_count = 0
@@ -277,13 +277,15 @@ def generateTiplets(
 
 
 
+  
   tokenizer: T.BertTokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-  model:BertForSequenceClassification = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH, 'best_epoch')) #type:ignore
-  model:BertForSequenceClassification = torch.compile(model) #type:ignore
-  model.to(device)
+  model:BertForSequenceClassification = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH, 'best_epoch')).to(device) #type:ignore
+  # model:BertForSequenceClassification = torch.compile(model) #type:ignore
   model.eval()
+  
+  @torch.inference_mode()
   def mask_causal_words(tokens:Tensor, batch:DataItem, importances: Tensor):
-    
+
 
     
     masking_attempts_allowed = len(tokens) if (len(tokens)<=MAX_MASKING_ATTEMPTS) or (MAX_MASKING_ATTEMPTS==0) else MAX_MASKING_ATTEMPTS
@@ -414,6 +416,17 @@ def generateTiplets(
 
   triplets_train, no_flip_idx_train = mask_data(train_loader, average_importance, sampling_ratio=sampling_ratio, augment_ratio=augment_ratio)
 
+
+  # * Clean up memory to prevent OOM errors on next run *
+  import torch._dynamo as dyn
+  dyn.reset()
+  del mlm_model
+  del model
+  dyn.reset()
+  gc.collect()
+  torch.cuda.empty_cache()
+
+    
   triplets_json:List[dict] = []
   triplets_pickle:dict[str,list] = {
     "label": [],
@@ -450,7 +463,6 @@ def generateTiplets(
   from splitAugmentedSet import splitAugmentedSet
 
   splitAugmentedSet(DATASET_NAME)
-
 
 
 
