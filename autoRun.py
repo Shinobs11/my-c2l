@@ -40,18 +40,6 @@ def main():
     #pretrain
   
   def pt():
-    # wandb.init(
-    #     project="my-c2l",
-    #     group=experiment_id,
-    #     job_type="pretrain",
-    #     reinit=True,
-    #     config={
-    #       "dataset": dataset_name,
-    #       "batch_size_pt": 8,
-    #       "n_epochs_pt":16,
-    #     },
-    #     magic=True
-    #     )
     gc.collect()
     torch.cuda.empty_cache()
     pretrainBERT(
@@ -61,26 +49,10 @@ def main():
         use_pinned_memory=False,
         lr=wandb.config.lr,
     )
-    # wandb.finish()
 
   pt()
 
   # def triplets():
-  #   # triplets
-  #   # wandb.init(
-  #   #   project="my-c2l",
-  #   #   group=experiment_id,
-  #   #   job_type="generate_triplets",
-  #   #   reinit=True,
-  #   #   config={
-  #   #    "dataset": dataset_name,
-  #   #    "sampling_ratio": 1,
-  #   #     "augment_ratio": 1,
-  #   #     "dropout_ratio": 0.5,
-  #   #     "max_masking_attempts": 50,
-  #   #    },
-  #   #    magic=True
-  #   # )
   #   gc.collect()
   #   torch.cuda.empty_cache()
   #   generateTiplets(
@@ -92,7 +64,7 @@ def main():
   #       max_masking_attempts=wandb.config.max_masking_attempts,
   #       use_pinned_memory=False
   #   )
-  #   # wandb.finish()
+
 
   # triplets()
 
@@ -101,18 +73,6 @@ def main():
 
   #   #contrastive training
   def cl():
-    # wandb.init(
-    #    project="my-c2l",
-    #     group=experiment_id,
-    #     job_type="cl_training",
-    #     reinit=True,
-    #     config={
-    #    "dataset": dataset_name,
-    #     "batch_size_cl": 2,
-    #     "n_epochs_cl": 16
-    #    },
-    #    magic=True
-    # )
     gc.collect()
     torch.cuda.empty_cache()
     constrastiveTrain(
@@ -122,30 +82,19 @@ def main():
         batch_size=wandb.config.batch_size_cl,
         lr=wandb.config.lr,
     )
-    wandb.finish()
+
 
   cl()
 
   def eval_pt():
     pretrain_eval_batch_size = 8
     pre_use_cl_model = False
-    # wandb.init(
-    #    project="my-c2l",
-    #     group=experiment_id,
-    #     job_type="pretrain_evaluation",
-    #     reinit=True,
-    #     config={
-    #    "dataset": dataset_name,
-    #    "batch_size_pt_eval": 24,
-    #    },
-    #    magic=True
-    # )
     evaluateModel(
         dataset_name=wandb.config.dataset,
         batch_size=wandb.config.batch_size_pt_eval,
         use_cl_model=pre_use_cl_model
     )
-    # wandb.finish()
+
 
 
   eval_pt()
@@ -153,23 +102,11 @@ def main():
   def eval_cl():
     cl_eval_batch_size = 8
     cl_use_cl_model = True
-    # wandb.init(
-    #    project="my-c2l",
-    #     group=experiment_id,
-    #     job_type="cl_evaluation",
-    #     reinit=True,
-    #     config={
-    #    "dataset": dataset_name,
-    #     "batch_size_cl_eval": 24,
-    #    },
-    #    magic=True
-    # )
     evaluateModel(
         dataset_name=wandb.config.dataset,
         batch_size=wandb.config.batch_size_cl_eval,
         use_cl_model=cl_use_cl_model
     )
-    # wandb.finish()
 
   eval_cl()
   
