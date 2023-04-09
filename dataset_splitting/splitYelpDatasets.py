@@ -46,6 +46,10 @@ yelp_zip_train["label"] = yelp_zip_train["label"].transform((lambda x: [0.0, 1.0
 yelp_zip_test["label"] = yelp_zip_test["label"].transform((lambda x: [0.0, 1.0] if x == 1 else [1.0, 0.0]))
 
 
+
+
+
+
 chi_train_set = yelp_chi_train.drop(yelp_chi_train.index[int(len(yelp_chi_train)*0.75):])
 chi_valid_set = yelp_chi_train.drop(yelp_chi_train.index[:int(len(yelp_chi_train)*0.75)])
 chi_test_set = yelp_chi_test
@@ -57,6 +61,8 @@ nyc_test_set = yelp_nyc_test
 zip_train_set = yelp_zip_train.drop(yelp_zip_train.index[int(len(yelp_zip_train)*0.75):])
 zip_valid_set = yelp_zip_train.drop(yelp_zip_train.index[:int(len(yelp_zip_train)*0.75)])
 zip_test_set = yelp_zip_test
+
+
 
 
 
@@ -77,11 +83,11 @@ data_sets = (
 
 
 
+import csv
 for ds in data_sets:
-  pdump(ds[0], os.path.join(ds[3], "train_set"))
-  pdump(ds[1], os.path.join(ds[3], "valid_set"))
-  pdump(ds[2], os.path.join(ds[3], "test_set"))
-
-  ds[0].to_csv(os.path.join(ds[3], "train_set.csv"), index=False)
-  ds[1].to_csv(os.path.join(ds[3], "valid_set.csv"), index=False)
-  ds[2].to_csv(os.path.join(ds[3], "test_set.csv"), index=False)
+  ds[0]['text'].transform((lambda x: x.strip('\"')))
+  ds[1]['text'].transform((lambda x: x.strip('\"')))
+  ds[2]['text'].transform((lambda x: x.strip('\"')))
+  ds[0].to_csv(os.path.join(ds[3], "train_set.csv"), quoting=csv.QUOTE_ALL, index=False)
+  ds[1].to_csv(os.path.join(ds[3], "valid_set.csv"), quoting=csv.QUOTE_ALL, index=False)
+  ds[2].to_csv(os.path.join(ds[3], "test_set.csv"), quoting=csv.QUOTE_ALL, index=False)

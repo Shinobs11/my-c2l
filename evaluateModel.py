@@ -14,13 +14,13 @@ from src.logging.logSetup import logSetup, mainLogger
 from src.classes.model import BertForCounterfactualRobustness
 
 
-torch.manual_seed(0)
-import numpy as np
-np.random.seed(0)
-import random
-random.seed(0)
-torch.cuda.manual_seed_all(0)
-torch.use_deterministic_algorithms(True)
+# torch.manual_seed(0)
+# import numpy as np
+# np.random.seed(0)
+# import random
+# random.seed(0)
+# torch.cuda.manual_seed_all(0)
+# torch.use_deterministic_algorithms(True)
 
 
 log_path = os.path.join(os.path.split(str(__file__))[0], "logs", "eval")

@@ -52,16 +52,17 @@ def constrastiveTrain(
   dataset_name: str,
   batch_size: int,
   epoch_num: int,
-  lambda_weight: float
+  lambda_weight: float,
+  lr: float,
 ):
   
-  torch.manual_seed(0)
-  import numpy as np
-  np.random.seed(0)
-  import random
-  random.seed(0)
-  torch.cuda.manual_seed_all(0)
-  torch.use_deterministic_algorithms(True)
+  # torch.manual_seed(0)
+  # import numpy as np
+  # np.random.seed(0)
+  # import random
+  # random.seed(0)
+  # torch.cuda.manual_seed_all(0)
+  # torch.use_deterministic_algorithms(True)
   
   
   log_memory(LOG_MEMORY_PATH, "cl_before.json")
@@ -74,8 +75,8 @@ def constrastiveTrain(
 
 
   DATASET_NAME = dataset_name
-  # DATASET_PATH = f"datasets/{DATASET_NAME}/augmented_triplets"
-  DATASET_PATH = f"datasets/{DATASET_NAME}/base"
+  DATASET_PATH = f"datasets/{DATASET_NAME}/augmented_triplets"
+  # DATASET_PATH = f"datasets/{DATASET_NAME}/base"
   OUTPUT_PATH = f"checkpoints/{DATASET_NAME}/augmented_model"
   EPOCH_NUM = epoch_num
   BATCH_SIZE = batch_size
@@ -85,21 +86,21 @@ def constrastiveTrain(
     valid_set:pd.DataFrame = pload(os.path.join(DATASET_PATH, 'valid_set'))
     train_labels = train_set['label'].to_list()
     valid_labels = valid_set['label'].to_list()
-    # anchor_train_texts = train_set['anchor_text'].to_list()
-    anchor_train_texts = train_set['text'].to_list()
+    anchor_train_texts = train_set['anchor_text'].to_list()
+    # anchor_train_texts = train_set['text'].to_list()
     anchor_valid_texts = valid_set['text'].to_list()
-    # positive_train_texts = train_set['positive_text'].to_list()
-    # negative_train_texts = train_set['negative_text'].to_list()
-    # train_triplet_sample_masks = train_set['triplet_sample_mask'].to_list()
-    train_triplet_sample_masks = [True for x in range(len(train_set))]
+    positive_train_texts = train_set['positive_text'].to_list()
+    negative_train_texts = train_set['negative_text'].to_list()
+    train_triplet_sample_masks = train_set['triplet_sample_mask'].to_list()
+    # train_triplet_sample_masks = [True for x in range(len(train_set))]
     tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
     anchor_train_encodings = tokenizer(anchor_train_texts, truncation=True, padding=True)
     anchor_valid_encodings = tokenizer(anchor_valid_texts, truncation=True, padding=True)
-    # positive_train_encodings = tokenizer(positive_train_texts, truncation=True, padding=True)
-    # negative_train_encodings = tokenizer(negative_train_texts, truncation=True, padding=True)
-    train_dataset = CFClassifcationDataset(anchor_train_encodings, anchor_train_encodings, anchor_train_encodings, train_triplet_sample_masks, train_labels)
+    positive_train_encodings = tokenizer(positive_train_texts, truncation=True, padding=True)
+    negative_train_encodings = tokenizer(negative_train_texts, truncation=True, padding=True)
+    # train_dataset = CFClassifcationDataset(anchor_train_encodings, anchor_train_encodings, anchor_train_encodings, train_triplet_sample_masks, train_labels)
 
-    # train_dataset = CFClassifcationDataset(anchor_train_encodings, positive_train_encodings, negative_train_encodings, train_triplet_sample_masks, train_labels)
+    train_dataset = CFClassifcationDataset(anchor_train_encodings, positive_train_encodings, negative_train_encodings, train_triplet_sample_masks, train_labels)
     valid_dataset = ClassificationDataset(anchor_valid_encodings, valid_labels)
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False)
     valid_loader = DataLoader(valid_dataset, batch_size=BATCH_SIZE, shuffle=False)

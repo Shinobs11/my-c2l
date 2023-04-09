@@ -5,11 +5,11 @@ from contrastiveLearning import constrastiveTrain
 from evaluateModel import evaluateModel
 
 # torch.use_deterministic_algorithms(True)
-torch.manual_seed(0)
-import numpy as np
-np.random.seed(0)
-import random
-random.seed(0)
+# torch.manual_seed(0)
+# import numpy as np
+# np.random.seed(0)
+# import random
+# random.seed(0)
 
 
 

@@ -37,7 +37,8 @@ def pretrainBERT(
   dataset_name: str,
   batch_size: int,
   epoch_num: int,
-  use_pinned_memory: bool
+  use_pinned_memory: bool,
+  lr: float,
 ):
 
 
@@ -55,14 +56,13 @@ def pretrainBERT(
   log_memory(LOG_MEMORY_PATH, "pt_before.json")
 
 
-
+  import ast
   def loadTrainData():
     tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
-    train_set = pload(os.path.join(DATASET_PATH, "train_set"))
-    train_labels:list = train_set['label'].tolist()
+    train_set = pd.read_csv(os.path.join(DATASET_PATH, "train_set.csv"))
+    train_labels:list[list] = [ast.literal_eval(x) for x in train_set['label'].tolist()]
     train_texts:list[str] = train_set['text'].tolist()
     train_encodings = tokenizer(train_texts, padding=True, truncation=True)
-    pdump(train_encodings, os.path.join(DATASET_PATH, "train_encodings"))
     train_dataset = ClassificationDataset(labels=train_labels, encodings=train_encodings)
     train_loader = DataLoader(
       train_dataset,
@@ -77,11 +77,10 @@ def pretrainBERT(
 
   def loadValData():
     tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
-    valid_set = pload(os.path.join(DATASET_PATH, "valid_set"))
+    valid_set = pd.read_csv(os.path.join(DATASET_PATH, "valid_set.csv"))
     valid_texts:list[str] = valid_set['text'].tolist()
-    valid_labels: list = valid_set['label'].tolist()
+    valid_labels: list = [ast.literal_eval(x) for x in valid_set['label'].tolist()]
     valid_encodings = tokenizer(valid_texts, padding=True, truncation=True)
-    pdump(valid_encodings, os.path.join(DATASET_PATH, "valid_encodings"))
     valid_dataset = ClassificationDataset(labels=valid_labels, encodings=valid_encodings)
     valid_loader = DataLoader(
       valid_dataset,
@@ -96,15 +95,7 @@ def pretrainBERT(
 
 
   def pretrainModel():
-    torch.manual_seed(0)
-    import numpy as np
 
-    np.random.seed(0)
-    import random
-
-    random.seed(0)
-    torch.cuda.manual_seed_all(0)
-    torch.use_deterministic_algorithms(True)
     
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -112,14 +103,11 @@ def pretrainBERT(
       torch.cuda.empty_cache()
     
 
-    if os.path.exists(os.path.join(DATASET_PATH, "trainLoader.pickle.blosc")):
-      train_loader: DataLoader = pload(os.path.join(DATASET_PATH, "trainLoader"))
-    else:
-      train_loader: DataLoader  = loadTrainData()
-    if os.path.exists(os.path.join(DATASET_PATH, "validLoader.pickle.blosc")):
-      valid_loader: DataLoader  = pload(os.path.join(DATASET_PATH, "validLoader"))
-    else:
-      valid_loader: DataLoader  = loadValData()
+
+    train_loader: DataLoader  = loadTrainData()
+
+
+    valid_loader: DataLoader  = loadValData()
     
 
 
@@ -158,6 +146,7 @@ def pretrainBERT(
       train_progress_bar = tqdm(train_loader)
 
       for batch in train_progress_bar:
+        
         optim.zero_grad()
         
         input_ids = batch['input_ids'].to(device, dtype=torch.int)
@@ -198,7 +187,7 @@ def pretrainBERT(
         
         train_progress_bar.set_description("Epoch train_accuracy %f" % train_metrics.compute().item())
         optim.step()
-        warmup.step()
+        # warmup.step()
         # scheduler.step()
         steps+=1
       cumulative_train_loss+= epoch_train_loss

@@ -16,13 +16,13 @@ import typing
 from torch.cuda.amp.autocast_mode import autocast
 from typing import Tuple, Union, List
 
-torch.use_deterministic_algorithms(True)
-torch.manual_seed(0)
-import numpy as np
-np.random.seed(0)
-import random
-random.seed(0)
-torch.cuda.manual_seed_all(0)
+# torch.use_deterministic_algorithms(True)
+# torch.manual_seed(0)
+# import numpy as np
+# np.random.seed(0)
+# import random
+# random.seed(0)
+# torch.cuda.manual_seed_all(0)
 
 
 

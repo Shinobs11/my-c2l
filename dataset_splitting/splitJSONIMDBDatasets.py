@@ -1,3 +1,4 @@
+from hmac import new
 import sys, os
 sys.path.append(f"{os.getcwd()}")
 
@@ -34,24 +35,27 @@ def convertToTable(items:typing.List[dict])-> pd.DataFrame:
     "text": table_dict["anchor_text"],
     "label": [[l for l in lst] for lst in table_dict["label"]] #type:ignore
   })
+  table['text'].transform(lambda x: x.strip('\"'))
+  
   # table["label"] = table["label"].transform(lambda x: 0 if x == [0.0, 1.0] else 1)
 
   return table
-  
-os.makedirs(os.path.join(DATASET_PATH, "base"))
+import csv
+if not os.path.exists(os.path.join(DATASET_PATH, "base")):
+  os.makedirs(os.path.join(DATASET_PATH, "base"))
 if(os.path.isdir(DATASET_PATH)):
   paths = glob.glob(os.path.join(DATASET_PATH, "*.json"))
   for p in paths:
     with open(p, mode='r') as f:
       table = convertToTable(json.load(f))
       path_no_ext = os.path.splitext(p)[0]
-      new_path = os.path.join(os.path.split(p)[0], "base", os.path.split(p)[1])
-      pdump(table, new_path)
-      table.to_csv(new_path + ".csv", index=False)
+      print(path_no_ext)
+      new_path = os.path.join(os.path.split(p)[0], "base", os.path.split(path_no_ext)[1])
+      print(new_path)
+      table.to_csv(new_path + ".csv", quoting=csv.QUOTE_ALL, index=False)
       
 else:
   with open(DATASET_PATH, mode='r') as f:
     table = convertToTable(json.load(f))
-    pdump(table, os.path.splitext(DATASET_PATH)[0])
-    table.to_csv(os.path.splitext(DATASET_PATH)[0] + ".csv", index=False)
+    table.to_csv(os.path.splitext(DATASET_PATH)[0] + ".csv", quoting=csv.QUOTE_ALL, index=False)
 

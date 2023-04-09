@@ -20,7 +20,7 @@ ipywidgets = "^8.0.4"
 torchmetrics = "^0.11.1"
 matplotlib = "^3.7.0"
 wandb = "^0.13.11"
-torch = "^2.0.0"
+torch = {version = "^2.0.0", extras = ["cu118"]}
 
 
 
