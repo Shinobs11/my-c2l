@@ -14,13 +14,13 @@ from src.logging.logSetup import logSetup, mainLogger
 from src.classes.model import BertForCounterfactualRobustness
 
 
-# torch.manual_seed(0)
-# import numpy as np
-# np.random.seed(0)
-# import random
-# random.seed(0)
-# torch.cuda.manual_seed_all(0)
-# torch.use_deterministic_algorithms(True)
+torch.manual_seed(0)
+import numpy as np
+np.random.seed(0)
+import random
+random.seed(0)
+torch.cuda.manual_seed_all(0)
+torch.use_deterministic_algorithms(True)
 
 
 log_path = os.path.join(os.path.split(str(__file__))[0], "logs", "eval")
@@ -80,10 +80,9 @@ def evaluateModel(
     exit()
 
   torch.cuda.empty_cache()
-  model: torch.nn.Module = BertForCounterfactualRobustness.from_pretrained(os.path.join(MODEL_PATH, "best_epoch"), num_labels=num_labels) #type:ignore
-  # model: torch.nn.Module = torch.compile(model) #type:ignore
+  model: torch.nn.Module = BertForCounterfactualRobustness.from_pretrained(os.path.join(MODEL_PATH, "best_epoch"), num_labels=num_labels).to(device) #type:ignore
   model.eval()
-  model.to(device)
+
 
 
 

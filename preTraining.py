@@ -62,41 +62,6 @@ def pretrainBERT(
   log_memory(LOG_MEMORY_PATH, "pt_before.json")
 
 
-  import ast
-  def loadTrainData():
-    tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
-    train_set = pd.read_csv(os.path.join(DATASET_PATH, "train_set.csv"))
-    train_labels:list[list] = [ast.literal_eval(x) for x in train_set['label'].tolist()]
-    train_texts:list[str] = train_set['text'].tolist()
-    train_encodings = tokenizer(train_texts, padding=True, truncation=True)
-    train_dataset = ClassificationDataset(labels=train_labels, encodings=train_encodings)
-    train_loader = DataLoader(
-      train_dataset,
-      batch_size=BATCH_SIZE,
-      shuffle=False, #TODOS: test impact of shuffle
-      pin_memory=use_pinned_memory
-      )
-    
-    del tokenizer
-    del train_set
-    return train_loader
-
-  def loadValData():
-    tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
-    valid_set = pd.read_csv(os.path.join(DATASET_PATH, "valid_set.csv"))
-    valid_texts:list[str] = valid_set['text'].tolist()
-    valid_labels: list = [ast.literal_eval(x) for x in valid_set['label'].tolist()]
-    valid_encodings = tokenizer(valid_texts, padding=True, truncation=True)
-    valid_dataset = ClassificationDataset(labels=valid_labels, encodings=valid_encodings)
-    valid_loader = DataLoader(
-      valid_dataset,
-      batch_size=BATCH_SIZE,
-      shuffle=False,
-      pin_memory=use_pinned_memory
-    )
-    del tokenizer
-    del valid_set
-    return valid_loader
 
 
 
@@ -108,16 +73,6 @@ def pretrainBERT(
   if torch.cuda.is_available():
     torch.cuda.empty_cache()
   
-
-
-  train_loader: DataLoader  = loadTrainData()
-
-
-  valid_loader: DataLoader  = loadValData()
-  
-
-
-
 
   num_classes = -1
   if len(train_loader.dataset[0]["label"].shape) == 1: #type:ignore

@@ -1,0 +1,752 @@
+[
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "i ate here for the first time a week ago... omg... i loved everything about this place. the food is amazing, the service was superb and the dessert was delish!! no waiting too with the buffet... big perk when your hungry. i will come again, no doubt.",
+    "positive_text": "i ate here for the first time a week ago... omg... i loved everything about this place. the food is amazing, the service was superb and the dessert was delish!! no waiting too [MASK] the buffet... big perk when your hungry. i will come again, no doubt.",
+    "negative_text": "i ate here for the first time a week ago... omg... i loved everything about this place. the food is amazing, the service was superb and the dessert was delish! [MASK] no waiting too with the buffet... big perk when your hungry. i will come again, no doubt.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "what's not to love about 12 dollar sandwiches served with sneers from total bitches? also going there for brunch is the best because every time i want another glass of orange juice or a mimosa i get to get up and stand in line again, and they aren't usually very happy to see me buy more shit from them... i am also a huge fan of the twenty everpresent screaming babies they have installed to help bring kick my hangover up a notch. the chips are good.",
+    "positive_text": "what's not to love about 12 dollar sandwiches served with sneers from total bitches? also going there for brunch is the best because every time i want another glass of orange juice or a mimosa i get to [MASK] up and stand in line again, and they aren't usually very happy to see me buy more shit from them... i am also a huge fan of the twenty everpresent screaming babies they have installed to help bring kick my hangover up a notch. the chips are good.",
+    "negative_text": "what's not to love about 12 dollar sandwiches served with sneers from total bitches? also going there for brunch is the best because every time i want another glass of orange juice or [MASK] mimosa i get to get up and stand in line again, and they aren't usually very happy to see me buy more shit from them... i am also a huge fan of the twenty everpresent screaming babies they have installed to help bring kick my hangover up a notch. the chips are good.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "heard a lot about this place from people around the city and waited for about 40min to get in there. i thought it was a cool atmosphere, great service, and great pizza. you have to experience good chicago style pizza where you are in the city. this might be a little too touristy though - making it a little too crowded. but it was worth the experience.",
+    "positive_text": "heard a lot about this place from people around the city and waited for about 40min to get in there. i thought it was a cool atmosphere, great service, and great pizza. you have to experience good chicago style pizza where you are in the city. this might be a little too touristy though - making it [MASK] little too crowded. but it was worth the experience.",
+    "negative_text": "heard a lot about this place from people around the city and waited for about 40min to get in there. i thought it was a cool atmosphere, great service, and great pizza. you have to experience good chicago style pizza where you are in the city. this might be a little too touristy though - making it a little too crowded. but it was worth [MASK] experience.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "nice vietnamese food!",
+    "positive_text": "nice vietnamese [MASK]!",
+    "negative_text": "nice [MASK] food!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "not much to say except it's the best deep dish pizza around. you have to order the pepperoni, the cheese is carmelized on top and the combo is fantastic. don't bother with the thin crust, it's average at best.",
+    "positive_text": "not much to say except it's the best deep dish pizza around. you have to order the [MASK]oni, the cheese is carmelized on top and the combo is fantastic. don't bother with the thin crust, it's average at best.",
+    "negative_text": "[MASK] much to say except it's the best deep dish pizza around. you have to order the pepperoni, the cheese is carmelized on top and the combo is fantastic. don't bother with the thin crust, it's average at best.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "disregard any bad review on yelp - if you want to eat the most authentic and carefully prepared mexican food outside of mexico, head to chicago and wait for a table at frontera.",
+    "positive_text": "disregard any bad review on yelp - if you want to eat the most authentic and carefully prepared mexican food outside [MASK] mexico, head to chicago and wait for a table at frontera.",
+    "negative_text": "[MASK] any bad review on yelp - if you want to eat the most authentic and carefully prepared mexican food outside of mexico, head to chicago and wait for a table at frontera.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "still the best food around. wish they would open one in a less touristy part of town. don't the like the see and be seen aspect of it.",
+    "positive_text": "still the best food around. wish they would open one in a less touristy part of town. don't the [MASK] the see and be seen aspect of it.",
+    "negative_text": "[MASK] the best food around. wish they would open one in a less touristy part of town. don't the like the see and be seen aspect of it.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "oh god yes. i had one of those, hey ex - boyfriend, let's catch up nights, and we came to pequod's. the place was packed, meaning that i could blame my spaciness / awkwardness on being overstimulated, which i very much appreciated. as for the pizza, holy crap it was good. we got pepperoni and jalapeno, and it was yummy. the sauce is good - flavorful and not too garlicky, and the cheese on the crust really is great.",
+    "positive_text": "oh god yes. i had one of those, hey ex - boyfriend, let's catch up nights, and we came to pequod's. the place was packed, meaning that i could blame my spaciness / awkwardness on being overstimulated, which i very much appreciated. as for the pizza, holy crap it was [MASK]. we got pepperoni and jalapeno, and it was yummy. the sauce is good - flavorful and not too garlicky, and the cheese on the crust really is great.",
+    "negative_text": "oh [MASK] yes. i had one of those, hey ex - boyfriend, let's catch up nights, and we came to pequod's. the place was packed, meaning that i could blame my spaciness / awkwardness on being overstimulated, which i very much appreciated. as for the pizza, holy crap it was good. we got pepperoni and jalapeno, and it was yummy. the sauce is good - flavorful and not too garlicky, and the cheese on the crust really is great.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "pizza by - the - slice ( including deep dish ), great prices, kid - friendly. that's pretty much all i can ask for. a few slices of pizza, a salad, and some drinks cost a family of three less than twenty bucks and it was all super tasty. we'll definitely be returning.",
+    "positive_text": "pizza by - the - slice ( including deep dish ), great [MASK], kid - friendly. that's pretty much all i can ask for. a few slices of pizza, a salad, and some drinks cost a family of three less than twenty bucks and it was all super tasty. we'll definitely be returning.",
+    "negative_text": "[MASK] by - the - slice ( including deep dish ), great prices, kid - friendly. that's pretty much all i can ask for. a few slices of pizza, a salad, and some drinks cost a family of three less than twenty bucks and it was all super tasty. we'll definitely be returning.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "damn good chicken.",
+    "positive_text": "damn good chicken [MASK]",
+    "negative_text": "damn [MASK] chicken.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "i will admit that the food was pretty good, and the portions were generous. however, i didn't appreciate the attitude from our server. she made me feel like i was from outer space or something. because i spoke spanish? i'm from mexico, of course i speak spanish!",
+    "positive_text": "i [MASK] admit that the food was pretty good, and the portions were generous. however, i didn't appreciate the attitude from our server. she made me feel like i was from outer space or something. because i spoke spanish? i'm from mexico, of course i speak spanish!",
+    "negative_text": "i will admit that the food was pretty good, and the portions were generous. however, i didn't appreciate the attitude from our server [MASK] she made me feel like i was from outer space or something. because i spoke spanish? i'm from mexico, of course i speak spanish!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "spacious, white - tablecloth restaurant with superbly spicy food. the vindaloo surprised even the two most grizzled, heat - seeking spice lovers i know. one section of the voluminous menu offers \" bombay street snacks, \" which make nice little appetizer tidbits. plus, i ran into g - rod while i was eating here a few weeks ago. went back for the lunch buffet a scant 10 minutes before close - - impressive variety for lunch, although the spices had been toned down. the staff put no pressure to leave and even kept up the water service.",
+    "positive_text": "spacious, white - tablecloth restaurant with superbly spicy food. the vindaloo surprised even the two most grizzled, heat - seeking spice lovers i know. one section of the voluminous menu offers \" bombay street snacks, \" which make nice little appetizer tidbits. plus, i ran into g - rod while i was eating here a few weeks ago. went back for the lunch buffet a scant 10 minutes before close - - impressive variety for lunch, although the spices had [MASK] toned down. the staff put no pressure to leave and even kept up the water service.",
+    "negative_text": "spacious [MASK] white - tablecloth restaurant with superbly spicy food. the vindaloo surprised even the two most grizzled, heat - seeking spice lovers i know. one section of the voluminous menu offers \" bombay street snacks, \" which make nice little appetizer tidbits. plus, i ran into g - rod while i was eating here a few weeks ago. went back for the lunch buffet a scant 10 minutes before close - - impressive variety for lunch, although the spices had been toned down. the staff put no pressure to leave and even kept up the water service.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "love love love their roasted corn salad and their torta bacio ( chocolate desert ). the only reason for a 4 - star rating instead of a 5 is that the chefs refrain from making substitutions, which is a little bit odd for the price point.",
+    "positive_text": "love love love their roasted corn salad and their torta bacio ( chocolate desert ). the only reason for a 4 - star rating instead of a 5 is that the chefs refrain from making substitutions [MASK] which is a little bit odd for the price point.",
+    "negative_text": "love love love their roasted corn salad and their torta bacio ( chocolate desert [MASK]. the only reason for a 4 - star rating instead of a 5 is that the chefs refrain from making substitutions, which is a little bit odd for the price point.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "mark on lake shore drivei was disappointed with the delivery that we had on tuesday 10 / 25 / 11. when the food arrived it was cold my sandwich was very soggy and tasted bad. our order was short one diet coke and we were charged for it. when we called crisp they acted like it was our fault and we were talked down to. i don't recommend this place at all.",
+    "positive_text": "mark on lake shore drivei was disappointed with the delivery that we had on tuesday 10 / 25 / 11. when the food arrived it was cold my sandwich was very soggy and tasted bad. our order was short one diet coke and [MASK] were charged for it. when we called crisp they acted like it was our fault and we were talked down to. i don't recommend this place at all.",
+    "negative_text": "mark on lake shore drivei was disappointed with the delivery that we had on tuesday 10 / 25 / 11. when the food arrived it was [MASK] my sandwich was very soggy and tasted bad. our order was short one diet coke and we were charged for it. when we called crisp they acted like it was our fault and we were talked down to. i don't recommend this place at all.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "the best mussels and frites in town!!!! the only reason why i gave a 4 star instead of 5 was because they didn't carry any czech beer! what a bummer but the food was fantastic, the crowd was great. the ambiance is to die for. i would eat mussels and frites there every day if can!!! love it!",
+    "positive_text": "the best mussels and frites in town!!!! the only reason why i gave a 4 star instead of 5 was because they didn't carry any czech beer! what [MASK] bummer but the food was fantastic, the crowd was great. the ambiance is to die for. i would eat mussels and frites there every day if can!!! love it!",
+    "negative_text": "the best mussels and frites in town!!!! the only reason why i gave a 4 star instead of 5 was because [MASK] didn't carry any czech beer! what a bummer but the food was fantastic, the crowd was great. the ambiance is to die for. i would eat mussels and frites there every day if can!!! love it!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "this popped up in my old neighborhood so we checked it out for lunch one day. very reasonably priced food, and all sorts of people in the place. the soy chicken was excellent, and the lunch special is $ 9. 95 and comes with 2 mini egg rolls and kind of a small salad but it is a perfect portion. i had the basil noodles, spicy with the soy chicken. they deliver all the way to kedzie so i will order from them for delivery soon!",
+    "positive_text": "this popped up in my old neighborhood so we checked it out for lunch one day. very reasonably priced food, and all sorts [MASK] people in the place. the soy chicken was excellent, and the lunch special is $ 9. 95 and comes with 2 mini egg rolls and kind of a small salad but it is a perfect portion. i had the basil noodles, spicy with the soy chicken. they deliver all the way to kedzie so i will order from them for delivery soon!",
+    "negative_text": "this popped up in my old neighborhood so we checked it out for lunch one day. very reasonably priced food, and all sorts of people in [MASK] place. the soy chicken was excellent, and the lunch special is $ 9. 95 and comes with 2 mini egg rolls and kind of a small salad but it is a perfect portion. i had the basil noodles, spicy with the soy chicken. they deliver all the way to kedzie so i will order from them for delivery soon!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "well it seems like everyone and their mother has reviewed this place, and they should - this place is great. the hosts / hostesses could loose the attitude though, everytime i go there it seems like i am inconviencing them by asking for a table. the pizza is great and the beer selection will make you want to try all of them by night's end! great place for groups and to watch sports as well.",
+    "positive_text": "well it seems like everyone and their mother has reviewed this place, and they should - this place is great. the hosts / hostesses could loose the attitude though, everytime i go there it seems like i am inconviencing them by asking for a table. the pizza is great and the beer selection will make you want to try all of them by night's end! [MASK] place for groups and to watch sports as well.",
+    "negative_text": "well it seems like everyone and their mother has reviewed this place, and they should - this place is great. the hosts / hostesses could [MASK] the attitude though, everytime i go there it seems like i am inconviencing them by asking for a table. the pizza is great and the beer selection will make you want to try all of them by night's end! great place for groups and to watch sports as well.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "seriously the best veggie burgers i have had... ever! we ordered a few appetizers to share and each person ordered a main dish. we had too much food, next time we'll probably skip the appetizers. this place is large and has a good atmosphere. music playing, lots of people. has a homey feel. there is a \" library \" section in one area that looked kinda cool ( wilde was a writer ). service is good too.",
+    "positive_text": "seriously the best veggie burgers i have had... ever! we ordered a few appetizers to share and each person ordered a main dish. we had too much food, next time we'll probably skip the appetizers. this place is large and has a good atmosphere. music playing, lots of people. has a homey feel [MASK] there is a \" library \" section in one area that looked kinda cool ( wilde was a writer ). service is good too.",
+    "negative_text": "seriously the best veggie burgers i have had. [MASK]. ever! we ordered a few appetizers to share and each person ordered a main dish. we had too much food, next time we'll probably skip the appetizers. this place is large and has a good atmosphere. music playing, lots of people. has a homey feel. there is a \" library \" section in one area that looked kinda cool ( wilde was a writer ). service is good too.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "its really hard to get a table on the weekend if you don't have reso's. but this place is so amazing! i love their pecking duck and the combo meal... such a great value. i even love their little to - go kitchen they have. the chinese bbq pork is sooo good!",
+    "positive_text": "its really hard to get a table on the [MASK] if you don't have reso's. but this place is so amazing! i love their pecking duck and the combo meal... such a great value. i even love their little to - go kitchen they have. the chinese bbq pork is sooo good!",
+    "negative_text": "its really hard to get a table on the weekend if you don't have reso's. but this place is so amazing! i love their pecking duck and the combo meal... such a great value. i even love their little to - go kitchen they have. the chinese bbq pork is sooo good [MASK]",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "classic. breakfast. cool space. cool staff. totally cool. like it. love it, actually.",
+    "positive_text": "classic. breakfast. cool space. cool staff. totally cool. like it. love it, actually [MASK]",
+    "negative_text": "[MASK]. breakfast. cool space. cool staff. totally cool. like it. love it, actually.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "best salad bar ever! be careful not to load up on the heavier stuff though, because they charge by weight. the lentil soup is delicious, but sort of reminds me of the gravy at kfc. it definitely tastes chicken broth based, so beware vegetarians. as long as you're not going for the salad bar, this place is a great value. split the spicy falafel wrap overflowing with goodness and a cup of soup with a friend for under $ 10. the servers aren't the nicest guys, but that won't keep me away.",
+    "positive_text": "best salad bar ever! be careful not to load up on the heavier stuff though, because they charge by weight. the lentil soup is delicious, but sort of reminds me of the gravy at kfc. it definitely tastes chicken broth based, so beware vegetarians. as long as you're not going for the salad bar, this place is a great value. split the spicy [MASK]lafel wrap overflowing with goodness and a cup of soup with a friend for under $ 10. the servers aren't the nicest guys, but that won't keep me away.",
+    "negative_text": "best [MASK] bar ever! be careful not to load up on the heavier stuff though, because they charge by weight. the lentil soup is delicious, but sort of reminds me of the gravy at kfc. it definitely tastes chicken broth based, so beware vegetarians. as long as you're not going for the salad bar, this place is a great value. split the spicy falafel wrap overflowing with goodness and a cup of soup with a friend for under $ 10. the servers aren't the nicest guys, but that won't keep me away.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "i watched people move around to the sounds of people sitting. i tried a couple beers and they seemed adequate enough to do their job ( like most of us, right? right ). i engaged a dessert that was well made, built up, but fell slightly in it's actual performance. i may come back soon if the crowd dies down. also, much like the airport, this place features a family bathroom in which private parties can share intimate time in. a drinkingman's staple.",
+    "positive_text": "i watched people move around to the sounds of people sitting. i tried a couple beers and they seemed adequate enough to do their job ( like most of us, right? right ). i engaged a dessert that was well made, built up, but fell slightly in it's actual performance. i may come back soon if the crowd dies down [MASK] also, much like the airport, this place features a family bathroom in which private parties can share intimate time in. a drinkingman's staple.",
+    "negative_text": "i watched people move around to the sounds of people sitting. i tried a couple beers and they seemed adequate enough to do their job ( like most of us, right? right ). i engaged a dessert that was well made, built up, but fell slightly in it's actual performance. i may come back soon if the crowd dies down. also, much like the airport, this place features a family bathroom in which private parties can share intimate time in. a drinkingman's staple [MASK]",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "i went here for dinner last night and loved it! i had the lemon grass beef appetizer ( big enough for 2 - 3 people ) and the claypot catfish. everything was really good and the service was wonderful. byob - i'll definitely be back!",
+    "positive_text": "i went here for dinner last night and loved it! i had the lemon grass [MASK] appetizer ( big enough for 2 - 3 people ) and the claypot catfish. everything was really good and the service was wonderful. byob - i'll definitely be back!",
+    "negative_text": "i [MASK] here for dinner last night and loved it! i had the lemon grass beef appetizer ( big enough for 2 - 3 people ) and the claypot catfish. everything was really good and the service was wonderful. byob - i'll definitely be back!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "i took a good friend : ) of mine here last night and really enjoyed the food! we sat down at our table and it was nicely laid out the room was really cozy very family like. i had the gnocchi with bolognese sauce which was divine : ) it's a byob place and without a corking fee made everything really affordable. a really great place good food, home like atmosphere and great prices.",
+    "positive_text": "i took a good friend : ) of mine here last night and really enjoyed the food! we sat down at our table and it was nicely laid out the room was really cozy very family like. i had the gnocchi with bolog [MASK] sauce which was divine : ) it's a byob place and without a corking fee made everything really affordable. a really great place good food, home like atmosphere and great prices.",
+    "negative_text": "i [MASK] a good friend : ) of mine here last night and really enjoyed the food! we sat down at our table and it was nicely laid out the room was really cozy very family like. i had the gnocchi with bolognese sauce which was divine : ) it's a byob place and without a corking fee made everything really affordable. a really great place good food, home like atmosphere and great prices.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "for a fried chicken place, they have a lot of vegetable bowls. after you've had their famous wings and other assorted fried goodness, check out the korean menu items - they are delicious! they're also an interesting twist on some flavors that you might not be as familiar with, if your asian food experience is mostly of the chinese - thai - japanese variety. definitely worth several return trips. plus one of the employees looks just like peggy from \" mad men. \"",
+    "positive_text": "for a fried chicken place, they have a lot of vegetable bowls. after you've had their famous wings and other assorted fried goodness, check out the korean menu items - they are delicious! they're also an interesting twist on some flavors that you might not be as familiar with, if your asian food experience is [MASK] of the chinese - thai - japanese variety. definitely worth several return trips. plus one of the employees looks just like peggy from \" mad men. \"",
+    "negative_text": "for [MASK] fried chicken place, they have a lot of vegetable bowls. after you've had their famous wings and other assorted fried goodness, check out the korean menu items - they are delicious! they're also an interesting twist on some flavors that you might not be as familiar with, if your asian food experience is mostly of the chinese - thai - japanese variety. definitely worth several return trips. plus one of the employees looks just like peggy from \" mad men. \"",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "excellent food, from the cornbread to the gunthorp chicken, the vegetable sides to the pork belly, and the delicious gnocchi, everything was great. interesting preparations grounded in flavorful regional beginnings. we had a group of four and we were dickering over the iroquois cornbread ( i won ). very dark ambiance made it difficult to read the menu ( but isn't that what that flashlight app is for ) ; a bit noisy as the room fills. our server, mark, was exceptional - humorous and knowledgable. we will all be back often!",
+    "positive_text": "excellent food, from the cornbread to the gunthorp chicken, the vegetable sides to the pork belly, and the delicious gnocchi, everything was great. interesting preparations grounded in flavorful regional beginnings. we had a group of four and we were dickering over the iroquois cornbread ( i won ). very dark ambiance made it difficult to read the menu ( but isn't that what that [MASK] app is for ) ; a bit noisy as the room fills. our server, mark, was exceptional - humorous and knowledgable. we will all be back often!",
+    "negative_text": "excellent food, from the cornbread to the gunthorp chicken, the vegetable sides to the pork belly, and the delicious gnocchi, everything was great. interesting preparations grounded in flavorful regional beginnings. we had a group of four and we were dickering over the iroquois cornbread ( i won ). very dark am [MASK]ce made it difficult to read the menu ( but isn't that what that flashlight app is for ) ; a bit noisy as the room fills. our server, mark, was exceptional - humorous and knowledgable. we will all be back often!",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "from making our reservation to paying the check, this place is amazing! the staff is wonderful, cheery and hard working. the decor is so welcoming and warm. the food is delicious and great for you. my vegetarian sister - in - law and i went with my 3 picky young children and all of us loved our food! i live an hour and a half away and cannot wait to get back here!",
+    "positive_text": "from making our reservation to paying the check, this place is amazing! the staff is wonderful, cheery and hard working. the decor is so welcoming and warm. the food is delicious and great for you. my vegetarian sister - in - law and [MASK] went with my 3 picky young children and all of us loved our food! i live an hour and a half away and cannot wait to get back here!",
+    "negative_text": "from [MASK] our reservation to paying the check, this place is amazing! the staff is wonderful, cheery and hard working. the decor is so welcoming and warm. the food is delicious and great for you. my vegetarian sister - in - law and i went with my 3 picky young children and all of us loved our food! i live an hour and a half away and cannot wait to get back here!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "don't let the lines intimidate you, this place is worth the wait!",
+    "positive_text": "don't let the lines intimidate you, this place is worth [MASK] wait!",
+    "negative_text": "don [MASK] t let the lines intimidate you, this place is worth the wait!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "great place! the roof top bar is excellent!",
+    "positive_text": "great place! the roof top bar is [MASK]!",
+    "negative_text": "great [MASK]! the roof top bar is excellent!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "it is super fun here!!! i will be back soon. the food was good and the service was better.",
+    "positive_text": "[MASK] is super fun here!!! i will be back soon. the food was good and the service was better.",
+    "negative_text": "it [MASK] super fun here!!! i will be back soon. the food was good and the service was better.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "greatest place ever!!!!!!!!! their pizzas and artopitas are to die for!!!!!!!!!!!!!!!! i go there every weekend! thats my new spot - thats how amazing this place is!",
+    "positive_text": "greatest place [MASK]!!!!!!!!! their pizzas and artopitas are to die for!!!!!!!!!!!!!!!! i go there every weekend! thats my new spot - thats how amazing this place is!",
+    "negative_text": "greatest [MASK] ever!!!!!!!!! their pizzas and artopitas are to die for!!!!!!!!!!!!!!!! i go there every weekend! thats my new spot - thats how amazing this place is!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "yolk is possible one of the better breakfast place in chicago. the place was packed on a sunday and i believe that the neuroscience conference at mccormick place increased the traffic at the restaurant. the service was fast and seating was quick ( within 10 minutes of writing my name down ). the portions were average but very delicious. if you want to see how their service work, just sit at the bar and you'll see a live representation of \" hell's kitchen \" without all the cursing.",
+    "positive_text": "yolk is possible one of the better breakfast [MASK] in chicago. the place was packed on a sunday and i believe that the neuroscience conference at mccormick place increased the traffic at the restaurant. the service was fast and seating was quick ( within 10 minutes of writing my name down ). the portions were average but very delicious. if you want to see how their service work, just sit at the bar and you'll see a live representation of \" hell's kitchen \" without all the cursing.",
+    "negative_text": "yolk is possible one of the better breakfast place in chicago. the place was packed on a sunday and i believe that the neuroscience conference at mccormick place increased the traffic at the restaurant. the service was fast and seating was quick ( within 10 minutes of writing my name down ). the portions were average but very delicious [MASK] if you want to see how their service work, just sit at the bar and you'll see a live representation of \" hell's kitchen \" without all the cursing.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "we went here for my bday, it was awesome. the food was fresh, the salad bar has so many options. the waiter was nice after dinner we head up to the bar upstairs. prices is affordable, the dessert are amazing! definitely try out this place!",
+    "positive_text": "we went here for my bday, it was awesome. the food was fresh, the salad bar has so many options. the waiter was nice after dinner we head [MASK] to the bar upstairs. prices is affordable, the dessert are amazing! definitely try out this place!",
+    "negative_text": "we [MASK] here for my bday, it was awesome. the food was fresh, the salad bar has so many options. the waiter was nice after dinner we head up to the bar upstairs. prices is affordable, the dessert are amazing! definitely try out this place!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "i love this place! i take all my friends here and they love it too. we're hooked!",
+    "positive_text": "i love this place! i take all my friends here [MASK] they love it too. we're hooked!",
+    "negative_text": "i [MASK] this place! i take all my friends here and they love it too. we're hooked!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "whatever to the good reviews here. this place is really great at being really bad. the food stinks and the place was a mess ( including the bathrooms, which is a deal breaker for me ). there's good stuff going on in this neighborhood, but this isn't one of them!",
+    "positive_text": "whatever to the good reviews here. this place is really great at being really bad. the food stinks and the place was a mess ( including the bathrooms, which is a deal breaker for me ). there's good stuff going on in this neighborhood, but [MASK] isn't one of them!",
+    "negative_text": "whatever [MASK] the good reviews here. this place is really great at being really bad. the food stinks and the place was a mess ( including the bathrooms, which is a deal breaker for me ). there's good stuff going on in this neighborhood, but this isn't one of them!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "best cafe con leche i've ever had. i lived in key west and got hooked on this morning tradition. great food and atmosphere. welcome to the neighborhood! great addition to the neighborhood. update : i'd really like to see them do something about the horrible excuse for mojito mix they are using. i get that it's byob and that even offering a mix is a bonus and true muddled sugar and mint leaves is not likely, but the blended \" chopped \" mint mix is terrible.",
+    "positive_text": "best cafe con leche i've ever had. i lived in key west and got hooked on this morning tradition [MASK] great food and atmosphere. welcome to the neighborhood! great addition to the neighborhood. update : i'd really like to see them do something about the horrible excuse for mojito mix they are using. i get that it's byob and that even offering a mix is a bonus and true muddled sugar and mint leaves is not likely, but the blended \" chopped \" mint mix is terrible.",
+    "negative_text": "best cafe con leche i've ever had. i lived in key west and got hooked on this morning tradition. great food and atmosphere [MASK] welcome to the neighborhood! great addition to the neighborhood. update : i'd really like to see them do something about the horrible excuse for mojito mix they are using. i get that it's byob and that even offering a mix is a bonus and true muddled sugar and mint leaves is not likely, but the blended \" chopped \" mint mix is terrible.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "you should : make the trip sizzle : good food, great beer juice : best in chicago for belgian - style mussels. the frites are worth the trip alone. the rest is hit or miss.",
+    "positive_text": "you should : make the trip sizzle : good food, great beer juice : best in chicago for belgian - style mussels. the frites are worth the trip alone [MASK] the rest is hit or miss.",
+    "negative_text": "you should : make the trip sizzle : good food, great beer juice : best in chicago for belgian - style mussels. the frites are worth the trip alone. the rest is hit or miss [MASK]",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "insane beer list! so many to choose from! try the elvis burger! peanut butter and bacon and so good. i was hesitant to try it but the server ( can't remember her name but dark - haired, young, super quirky and easy - going ) recommended it and i was glad i tried it. great atmosphere to groups of friends - even pulled a game off the shelf and enjoyed it during drinks!",
+    "positive_text": "insane beer list! so many to choose from! try the elvis burger! peanut butter and bacon and so good. i was hesitant to try it but the server ( can't remember her name but dark - haired, young, super quirky and easy - going ) recommended it and i was glad i tried it. great atmosphere to groups of friends - even pulled a game off [MASK] shelf and enjoyed it during drinks!",
+    "negative_text": "insane [MASK] list! so many to choose from! try the elvis burger! peanut butter and bacon and so good. i was hesitant to try it but the server ( can't remember her name but dark - haired, young, super quirky and easy - going ) recommended it and i was glad i tried it. great atmosphere to groups of friends - even pulled a game off the shelf and enjoyed it during drinks!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "stumbled upon this place on a walk with my girlfriend. awesome surprise! great food, quick service, good atmosphere. i had the steak but i think i'll go w / the chicken option.... served w / black beans, white rice, and great plantains. only downfalls were limited seating and i'm pretty sure it didn't have a bathroom. i will be back there again..... fo sho.",
+    "positive_text": "stumbled upon this place on a walk with my girlfriend. awesome surprise! great food, quick service, good atmosphere. i had the steak but i think i'll go w / the chicken option.... served w / black beans, white rice, and great plantains [MASK] only downfalls were limited seating and i'm pretty sure it didn't have a bathroom. i will be back there again..... fo sho.",
+    "negative_text": "stumbled [MASK] this place on a walk with my girlfriend. awesome surprise! great food, quick service, good atmosphere. i had the steak but i think i'll go w / the chicken option.... served w / black beans, white rice, and great plantains. only downfalls were limited seating and i'm pretty sure it didn't have a bathroom. i will be back there again..... fo sho.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "ok... for me, it is a chicago staple... i used to come here all the time, and there is no reason why i haven't been here in quite some time other than to try others... yesterday, i experienced it for the first in years was glad to see nothing has changed... quality, generous food... pleasant, informed service... comfy, bright atmosphere... when it's right, it's right... no need to change anything...",
+    "positive_text": "ok... for me, it is a chicago staple... i used to come here all the time, and there is no reason [MASK] i haven't been here in quite some time other than to try others... yesterday, i experienced it for the first in years was glad to see nothing has changed... quality, generous food... pleasant, informed service... comfy, bright atmosphere... when it's right, it's right... no need to change anything...",
+    "negative_text": "ok [MASK].. for me, it is a chicago staple... i used to come here all the time, and there is no reason why i haven't been here in quite some time other than to try others... yesterday, i experienced it for the first in years was glad to see nothing has changed... quality, generous food... pleasant, informed service... comfy, bright atmosphere... when it's right, it's right... no need to change anything...",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "i am a big fan of steaks, and texas de brazil satisfied my carnivore fix. the selection of meat offerings were selective and great tasting. unique way of serving steak though, so it was really enjoyable. parking is a downside and the price might be a little over - the - top, but overall worth the experience.",
+    "positive_text": "i am a big fan of steaks, and texas de brazil satisfied my carnivore fix. the selection of meat offerings were selective and great tasting. unique way of [MASK] steak though, so it was really enjoyable. parking is a downside and the price might be a little over - the - top, but overall worth the experience.",
+    "negative_text": "i [MASK] a big fan of steaks, and texas de brazil satisfied my carnivore fix. the selection of meat offerings were selective and great tasting. unique way of serving steak though, so it was really enjoyable. parking is a downside and the price might be a little over - the - top, but overall worth the experience.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "i love this place. the pizza is always packed with so much flavor my mouth just can't handle it. if you can, sit out on the patio on a nice summer day. save room for dessert cause it is totally work the extra work at the gym the next day. the prices are a little higher but i think worth it.",
+    "positive_text": "[MASK] love this place. the pizza is always packed with so much flavor my mouth just can't handle it. if you can, sit out on the patio on a nice summer day. save room for dessert cause it is totally work the extra work at the gym the next day. the prices are a little higher but i think worth it.",
+    "negative_text": "i [MASK] this place. the pizza is always packed with so much flavor my mouth just can't handle it. if you can, sit out on the patio on a nice summer day. save room for dessert cause it is totally work the extra work at the gym the next day. the prices are a little higher but i think worth it.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "waited an hour on a thursday night to be served despite \" pre - ordering \" two individual pizzas. pizzas were second rate, and certainly not worth the wait. i don't understand the positive reviews. check out unos instead.",
+    "positive_text": "[MASK] an hour on a thursday night to be served despite \" pre - ordering \" two individual pizzas. pizzas were second rate, and certainly not worth the wait. i don't understand the positive reviews. check out unos instead.",
+    "negative_text": "waited an hour on a thursday night to be served despite \" pre - ordering \" two individual pizzas. pizzas were second rate, and certainly not worth the wait. i don't understand the positive reviews. check out uno [MASK] instead.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "omg! its a must stop location if you ever visit. i went to chicago for a dj event this pass summer, and i got to say. there stuffed pizza is to drull for!... lol.. as well as there italian beef sandwich. i will go back when i go back to visit!",
+    "positive_text": "omg! its a must stop location if you ever visit. i went to chicago for a dj event this pass summer, and i got to say. there stuffed pizza is to dr [MASK] for!... lol.. as well as there italian beef sandwich. i will go back when i go back to visit!",
+    "negative_text": "om [MASK]! its a must stop location if you ever visit. i went to chicago for a dj event this pass summer, and i got to say. there stuffed pizza is to drull for!... lol.. as well as there italian beef sandwich. i will go back when i go back to visit!",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "decent mexican. if you aren't in pilsen this isn't worth the trip.",
+    "positive_text": "decent mexican. if you aren [MASK] t in pilsen this isn't worth the trip.",
+    "negative_text": "[MASK] mexican. if you aren't in pilsen this isn't worth the trip.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "we went here for brunch on a saturday and only waited about 30 minutes for a spot at the bar. i had an extremely hard time deciding what to order, because the everything looked and sounded delicious. i had the rock shrimp benedict and it was honestly one of the best meals of my life. my boyfriend didn't enjoy his chicken / spinach / eggs as much. coffee and lattes are great and i would definitely go back.",
+    "positive_text": "we went here for brunch on a saturday and only waited about 30 minutes for a spot at the bar. i had an extremely hard time deciding what to order, because the everything looked and [MASK] delicious. i had the rock shrimp benedict and it was honestly one of the best meals of my life. my boyfriend didn't enjoy his chicken / spinach / eggs as much. coffee and lattes are great and i would definitely go back.",
+    "negative_text": "[MASK] went here for brunch on a saturday and only waited about 30 minutes for a spot at the bar. i had an extremely hard time deciding what to order, because the everything looked and sounded delicious. i had the rock shrimp benedict and it was honestly one of the best meals of my life. my boyfriend didn't enjoy his chicken / spinach / eggs as much. coffee and lattes are great and i would definitely go back.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "the meat is very good, the experience is ok, but the sides and appatizers were not great at all. the meat is like 3 stars worth, but something is missing to get it to 5 stars.",
+    "positive_text": "the meat is very good, the experience is ok, but the sides and appatizers were not great at all. the meat is like 3 stars worth, but something is missing to get it to 5 [MASK].",
+    "negative_text": "the meat is very good, the experience is ok, but the sides and appatizers were not great at all. the meat is like 3 stars [MASK], but something is missing to get it to 5 stars.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "excellent service. loved the beets with goat cheese, loved the pork fired almonds. vey friendly, very chic.",
+    "positive_text": "excellent service. loved the beets with goat cheese, loved the pork fired almonds. vey friendly [MASK] very chic.",
+    "negative_text": "[MASK] service. loved the beets with goat cheese, loved the pork fired almonds. vey friendly, very chic.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "the staff was very friendly. they even went out of their way to make a dish for me that was not on the menu, and it was amazing! the violinist / guitarist music was hard to take, but a + for the effort. i will go there again.",
+    "positive_text": "the staff was very friendly. they even went out of their way to make a dish for [MASK] that was not on the menu, and it was amazing! the violinist / guitarist music was hard to take, but a + for the effort. i will go there again.",
+    "negative_text": "the [MASK] was very friendly. they even went out of their way to make a dish for me that was not on the menu, and it was amazing! the violinist / guitarist music was hard to take, but a + for the effort. i will go there again.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "this is a great place for a date, girls night out, or a group dinner. the menu is so eclectic and very intricate. there are so many great choices on the menu that you can't go wrong. their paella is my favorite and i haven't found a place that tops it. their guacamole is different and very yummy, the chips are a little salty though. as for their mojitos, absolutely delicious! stay away from the bellinis, those are not so yummy. definitely would recommend this!",
+    "positive_text": "this is a great place for a date, girls night out, or a group dinner. the menu is so eclectic and very intricate. there are so many great choices on the menu that you can't go wrong. their paella is my favorite and i haven't found a place that tops it. their guacamole is different and very yummy, the chips are a little salty [MASK]. as for their mojitos, absolutely delicious! stay away from the bellinis, those are not so yummy. definitely would recommend this!",
+    "negative_text": "this [MASK] a great place for a date, girls night out, or a group dinner. the menu is so eclectic and very intricate. there are so many great choices on the menu that you can't go wrong. their paella is my favorite and i haven't found a place that tops it. their guacamole is different and very yummy, the chips are a little salty though. as for their mojitos, absolutely delicious! stay away from the bellinis, those are not so yummy. definitely would recommend this!",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "phenomenal! the food was excellent. the service equally as wonderful. great menu, drink selection, decor, i have nothing to complain about. tonight's special was amazing - quail stuffed with sea bass over a gumbo with sausage and chicken on rice. everything was delightful.",
+    "positive_text": "phenomenal! the food [MASK] excellent. the service equally as wonderful. great menu, drink selection, decor, i have nothing to complain about. tonight's special was amazing - quail stuffed with sea bass over a gumbo with sausage and chicken on rice. everything was delightful.",
+    "negative_text": "phenomena [MASK]! the food was excellent. the service equally as wonderful. great menu, drink selection, decor, i have nothing to complain about. tonight's special was amazing - quail stuffed with sea bass over a gumbo with sausage and chicken on rice. everything was delightful.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "my girlfriend and i went on a saturday night, at about 9 : 00, and we only had to wait for maybe 20 minutes and we didn't call before hand. while we waited we sat in the bar / lounge area and we knew we liked the place just from sitting in there. they have really good priced beers, and a lot of them on tap,",
+    "positive_text": "my girlfriend and i went on a saturday night, at about 9 : 00, and we only had to wait for maybe 20 minutes and we didn't call before hand. while we waited we sat in the bar [MASK] lounge area and we knew we liked the place just from sitting in there. they have really good priced beers, and a lot of them on tap,",
+    "negative_text": "my [MASK] and i went on a saturday night, at about 9 : 00, and we only had to wait for maybe 20 minutes and we didn't call before hand. while we waited we sat in the bar / lounge area and we knew we liked the place just from sitting in there. they have really good priced beers, and a lot of them on tap,",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "i've probably been here a half dozen times now, and each time the meal and service have been flawless. keep up the good work!",
+    "positive_text": "i've probably been here a half dozen times now, and each time the meal and service have been flawless. keep up the good [MASK]!",
+    "negative_text": "i [MASK] ve probably been here a half dozen times now, and each time the meal and service have been flawless. keep up the good work!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "as a former resident of chicago i always make it a point to get my hands on some deep dish pizza. this time it was a traditional sausage and if didn't disappoint. i recommend you be prepared to wait and keep the number of slices per person to 2. this ain't new york style thin crust where you can devour nearly a whole pie... customers can put away about two pieces on a good day at ginos!",
+    "positive_text": "as a former resident of chicago i always make it a point to get my hands on some deep dish pizza. this time it was a traditional sausage and if [MASK]'t disappoint. i recommend you be prepared to wait and keep the number of slices per person to 2. this ain't new york style thin crust where you can devour nearly a whole pie... customers can put away about two pieces on a good day at ginos!",
+    "negative_text": "as a former resident of chicago i always make it a point to get my hands on some deep dish pizza. this time it was a traditional sausage and if didn't disappoint. i recommend you be prepared to wait and keep the number of slices per person to 2. this ain't new york style thin crust where you can devour nearly a whole [MASK]... customers can put away about two pieces on a good day at ginos!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "i sat in a banquet room away from the restaurant. it was terrible. the service was good but it was not worth the money. the food was okay but there was not enough to taste for one person.",
+    "positive_text": "i sat [MASK] a banquet room away from the restaurant. it was terrible. the service was good but it was not worth the money. the food was okay but there was not enough to taste for one person.",
+    "negative_text": "i [MASK] in a banquet room away from the restaurant. it was terrible. the service was good but it was not worth the money. the food was okay but there was not enough to taste for one person.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "we were group of 5... non of us had nice food and will not go back. food was just ok - like i made it myself at my place for the very first time.... bland.... not sometnihg italian places are famous for. believe me i have had way better lasagna or pasta than food they serve!!! im giving one star for nice looking restaurant, ambience and decor... but thats not the reason for me to go back!",
+    "positive_text": "we were group of 5... non of us had nice food and will not go back. food was just ok - like i made it myself at my place for the very first time.... bland.... not sometnihg italian places are famous for. believe me i have had way better [MASK]agna or pasta than food they serve!!! im giving one star for nice looking restaurant, ambience and decor... but thats not the reason for me to go back!",
+    "negative_text": "we were group of 5... non of us had nice food and will not go back. food was just ok - like i made it myself at my place for the very first time.... bland.... not sometnihg italian places are famous for. believe me i have had way better lasagna or pasta than food they serve [MASK]!! im giving one star for nice looking restaurant, ambience and decor... but thats not the reason for me to go back!",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "a couple years back i would have given this place 5 stars. they've since raised prices and dropped my favorite item from the menu ( cuban steak sandwich ). but the jalapeno & honey butter they bring out with the complimentary bread... i could eat for hours.",
+    "positive_text": "a couple years back i would have given this place 5 stars. they've since raised prices and dropped my favorite item from the menu ( cuban steak sandwich ). but the jalapeno & [MASK] butter they bring out with the complimentary bread... i could eat for hours.",
+    "negative_text": "a [MASK] years back i would have given this place 5 stars. they've since raised prices and dropped my favorite item from the menu ( cuban steak sandwich ). but the jalapeno & honey butter they bring out with the complimentary bread... i could eat for hours.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "just ok! decorated great! warm cozy feel! food was not outstanding, it was just ok. nothing to brag about. prices are a little steep. i would think this is a great place to catch a game and if the place is packed and all cheering for the same team its probably a lot of fun. the place draws you in because it looks so good from the outside you just want to try it.",
+    "positive_text": "just ok! decorated great! warm cozy feel! food was not outstanding, it was just ok. nothing to brag about. prices are a little steep. i would think this is a great place to [MASK] a game and if the place is packed and all cheering for the same team its probably a lot of fun. the place draws you in because it looks so good from the outside you just want to try it.",
+    "negative_text": "just ok! decorated great! warm cozy feel! food was not outstanding, it was just ok. nothing to brag about. prices are a little steep. i would think this is a great place to catch a game and if the place is packed and all cheering for the same team its probably a lot of fun. the place draws you in because it looks so good [MASK] the outside you just want to try it.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "this is my go to place when i'm craving vietnamese and don't want to make the trek up to argyle. i've tried a number of items on their menu and everything has been really good, i would especially recommend the beef pho and the chicken dumplings they my favs! the service is always great here and owner is super nice and sweet. highly recommend this place!",
+    "positive_text": "this is my go to place when i'm craving vietnamese and don't want to make the trek up to argyle. i've tried a number of items on their menu and everything has been really good, i would especially recommend the beef pho and the chicken dumplings they [MASK] favs! the service is always great here and owner is super nice and sweet. highly recommend this place!",
+    "negative_text": "this is my go to place when i'm craving vietnamese and don't want to make the trek up to argyle. i've tried a number of items on their menu and everything has been really good, i would especially recommend the beef pho and the chicken dumplings they my favs! the service is always great here and owner is super nice and sweet [MASK] highly recommend this place!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "great beer and really good food. try the ham sandwich. the only knock against the place is that it's so popular. the wait for a table is going to be long, but, like i said, the beer is great.",
+    "positive_text": "great beer and really good food. try the ham sandwich. the only knock against the place is that it's so popular. the wait for a table is going to be long [MASK] but, like i said, the beer is great.",
+    "negative_text": "great beer and really [MASK] food. try the ham sandwich. the only knock against the place is that it's so popular. the wait for a table is going to be long, but, like i said, the beer is great.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "fabulous food, great decor both upstairs and downstairs. my only complaint is that i do not like eating in the dark.",
+    "positive_text": "fabulous food, great decor both upstairs [MASK] downstairs. my only complaint is that i do not like eating in the dark.",
+    "negative_text": "fabulous [MASK], great decor both upstairs and downstairs. my only complaint is that i do not like eating in the dark.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "really great ambiance, though, i agree with other yelpers that it is a bit cramped and a bit noisy. it was fine for a saturday out with a group of girls. lovely cocktails and we shared calamari as an app. chicken for the main was super moist and flavorful. other three girls enjoyed pastas in large portions. mia francesca was great about accommodating a vegetarian in the group, but offered a lack luster response after water was spilled on me.",
+    "positive_text": "really great ambiance, though, i agree with other [MASK]lpers that it is a bit cramped and a bit noisy. it was fine for a saturday out with a group of girls. lovely cocktails and we shared calamari as an app. chicken for the main was super moist and flavorful. other three girls enjoyed pastas in large portions. mia francesca was great about accommodating a vegetarian in the group, but offered a lack luster response after water was spilled on me.",
+    "negative_text": "really [MASK] ambiance, though, i agree with other yelpers that it is a bit cramped and a bit noisy. it was fine for a saturday out with a group of girls. lovely cocktails and we shared calamari as an app. chicken for the main was super moist and flavorful. other three girls enjoyed pastas in large portions. mia francesca was great about accommodating a vegetarian in the group, but offered a lack luster response after water was spilled on me.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "owner is very funny and nice. the food is amazing. try the mango shake as well as the goat cheese empanadas. only set back is that there is no seating indoors ( outdoor seating available in summer ).",
+    "positive_text": "owner is very funny and nice. the food is amazing. try the mango shake as well as [MASK] goat cheese empanadas. only set back is that there is no seating indoors ( outdoor seating available in summer ).",
+    "negative_text": "owner [MASK] very funny and nice. the food is amazing. try the mango shake as well as the goat cheese empanadas. only set back is that there is no seating indoors ( outdoor seating available in summer ).",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "i love the chicago diner! the only reason i don't give it 5 stars is that there is always a lengthy wait for a table. if you want healthy, comfort food, this is the place and if you want some amazing desserts, look no further. there food is a party in my tummy no matter what i choose.",
+    "positive_text": "[MASK] love the chicago diner! the only reason i don't give it 5 stars is that there is always a lengthy wait for a table. if you want healthy, comfort food, this is the place and if you want some amazing desserts, look no further. there food is a party in my tummy no matter what i choose.",
+    "negative_text": "i [MASK] the chicago diner! the only reason i don't give it 5 stars is that there is always a lengthy wait for a table. if you want healthy, comfort food, this is the place and if you want some amazing desserts, look no further. there food is a party in my tummy no matter what i choose.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "they have really great pizza here. it's called new haven style pizza. never been to new haven, so i can't compare that aspect. i really admire a restaurant with it's own brewery too. i've tried most of their brews and they are excellent. it is pretty large inside with really long tables for multiple groups to sit at. this gives it sort of a mess hall / highschool cafeteria feel. nobody's going to make you stand in the corner for being too loud here though.",
+    "positive_text": "they have really great pizza here. it's called new haven style [MASK]. never been to new haven, so i can't compare that aspect. i really admire a restaurant with it's own brewery too. i've tried most of their brews and they are excellent. it is pretty large inside with really long tables for multiple groups to sit at. this gives it sort of a mess hall / highschool cafeteria feel. nobody's going to make you stand in the corner for being too loud here though.",
+    "negative_text": "they have really great pizza here. it's called new haven style pizza. never been to new haven, so i can [MASK] t compare that aspect. i really admire a restaurant with it's own brewery too. i've tried most of their brews and they are excellent. it is pretty large inside with really long tables for multiple groups to sit at. this gives it sort of a mess hall / highschool cafeteria feel. nobody's going to make you stand in the corner for being too loud here though.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "my daughters and i had brunch at frontera grill june 25, 2011. we had been so looking forward to this meal and were totally shocked and disappointed. the only saving grace was the margaritas. the guacamole and tostaditas de ceviche were tasteless. the cazuela de tinga, enchiladas de mole and duck tacos, salty and served room temperature as were the sides. we are foodies, watch mr. bayless on pbs and chef shows and know he too would be shocked at our meal and service. one of the worst dining experiences ever!",
+    "positive_text": "my daughters and i had brunch at frontera grill june 25, 2011. we had been so looking forward to this meal and were totally shocked and disappointed. the only saving grace was the margaritas. the guacamole and tostaditas de ceviche were tasteless. the cazuela de tinga, enchiladas de mole and duck tacos, salty and served room temperature as were the sides. we are foodies, watch mr. bayless on pbs [MASK] chef shows and know he too would be shocked at our meal and service. one of the worst dining experiences ever!",
+    "negative_text": "my [MASK] and i had brunch at frontera grill june 25, 2011. we had been so looking forward to this meal and were totally shocked and disappointed. the only saving grace was the margaritas. the guacamole and tostaditas de ceviche were tasteless. the cazuela de tinga, enchiladas de mole and duck tacos, salty and served room temperature as were the sides. we are foodies, watch mr. bayless on pbs and chef shows and know he too would be shocked at our meal and service. one of the worst dining experiences ever!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "it's an institution. it's as cheap as food gets. it's amazing. my personal favorite items are the chilaquiles ( which are under 5 bucks ) and the steak tostadas ( absolutely loaded : beans, cheese, meat, lettuce, tomato, onion, sour cream, guacamole ).",
+    "positive_text": "it's an institution. it's as cheap as food gets. it's amazing. my personal favorite items are the chilaquiles ( which are under 5 bucks ) and the steak tostadas ( absolutely loaded : beans, cheese, meat, let [MASK]ce, tomato, onion, sour cream, guacamole ).",
+    "negative_text": "it [MASK] s an institution. it's as cheap as food gets. it's amazing. my personal favorite items are the chilaquiles ( which are under 5 bucks ) and the steak tostadas ( absolutely loaded : beans, cheese, meat, lettuce, tomato, onion, sour cream, guacamole ).",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "well, i was really looking forward to this based on feedback and reviews.... i was not disappointed. i ordered the eggs new orleans and was really happy with it. the coffee was good and so was the service. i would suggest getting there early though as it was very crowded. will definitely be back...",
+    "positive_text": "well, i was really looking forward to this based on feedback and [MASK].... i was not disappointed. i ordered the eggs new orleans and was really happy with it. the coffee was good and so was the service. i would suggest getting there early though as it was very crowded. will definitely be back...",
+    "negative_text": "well [MASK] i was really looking forward to this based on feedback and reviews.... i was not disappointed. i ordered the eggs new orleans and was really happy with it. the coffee was good and so was the service. i would suggest getting there early though as it was very crowded. will definitely be back...",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "wildfire is one of my favorite restaurants hands down. their salmon is so flavorful and well cooked. their scallops and sauteed spinach dish is one of my favorite dishes... those scallops are * kisses fingers * magnificent. the steaks are wonderful and the surf and turf is excellent. oh yes. i will be coming back.... definitely.",
+    "positive_text": "wildfire is one of my favorite restaurants hands down. their salmon is so flavorful and well cooked. their scallops and sauteed spinach dish is one of my favorite dishes... those [MASK]allops are * kisses fingers * magnificent. the steaks are wonderful and the surf and turf is excellent. oh yes. i will be coming back.... definitely.",
+    "negative_text": "wildfire is one of my favorite restaurants hands down. their salmon is so flavorful and well cooked. their scallops and sauteed spinach dish is one of my favorite dishes... those scallops are * kisses fingers * magnificent. the steaks are wonderful and the surf and turf is excellent. oh yes [MASK] i will be coming back.... definitely.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "where do i begin. i went here right after christmas after i received a gift certificate. i should have re - gifted. if you want to sit in a loud cafeteria and eat an over priced steak with a charcoal crust while you yell at your date this is the place for you! there is nothing special about this place, so if you want a nice environment and a proper steak for the same price, checkout the chicago firehouse.",
+    "positive_text": "where do i begin. i went here right after christmas after i received a gift certificate. i should have re - gifted. if you want to sit in a loud cafeteria and eat an over priced steak with a charcoal crust while you yell at your date this is the place for you! there is nothing special about this place, so if you want a nice environment and a proper steak for the same price, checkout the chicago [MASK]house.",
+    "negative_text": "where [MASK] i begin. i went here right after christmas after i received a gift certificate. i should have re - gifted. if you want to sit in a loud cafeteria and eat an over priced steak with a charcoal crust while you yell at your date this is the place for you! there is nothing special about this place, so if you want a nice environment and a proper steak for the same price, checkout the chicago firehouse.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "i love cubans! this place is pretty good. the coconut shrimp was a hit and so was the salmon and the steaks and the pork. and you can't go wrong with alcohol. no one really had a bad meal and i would recommend going again. if you want to hang out all night i would recommend going after 7pm. if you are starving and want a meal served fast go before 7pm.",
+    "positive_text": "i love cubans! this place is pretty good. the coconut shrimp was a hit and so was the salmon and the steaks and the pork. and you can't go wrong with alcohol. no one really had a bad meal and i would recommend going again. if you want to hang out all night i would recommend going after 7pm. if you are starving and want [MASK] meal served fast go before 7pm.",
+    "negative_text": "i [MASK] cubans! this place is pretty good. the coconut shrimp was a hit and so was the salmon and the steaks and the pork. and you can't go wrong with alcohol. no one really had a bad meal and i would recommend going again. if you want to hang out all night i would recommend going after 7pm. if you are starving and want a meal served fast go before 7pm.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "our favorite chinese restaurant for more than 10 years. service and quality have declined dramatically recently. we have vowed never to return or order food delivered again. staff is unresponsive and management is absent.",
+    "positive_text": "our favorite chinese restaurant [MASK] more than 10 years. service and quality have declined dramatically recently. we have vowed never to return or order food delivered again. staff is unresponsive and management is absent.",
+    "negative_text": "our favorite chinese restaurant for more than 10 years. service and quality have declined dramatically [MASK]. we have vowed never to return or order food delivered again. staff is unresponsive and management is absent.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "very good thin crust! i think it's their magic sauce. i'll be back for the golden arm. it reminds me of the kolsch beer in cologne. and definitely back for their pizza! molto ben!",
+    "positive_text": "very good thin crust! i think [MASK]'s their magic sauce. i'll be back for the golden arm. it reminds me of the kolsch beer in cologne. and definitely back for their pizza! molto ben!",
+    "negative_text": "very good thin crust [MASK] i think it's their magic sauce. i'll be back for the golden arm. it reminds me of the kolsch beer in cologne. and definitely back for their pizza! molto ben!",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "we decided to go here because the 2011 reader poll named this restaurant the best thai food in chicago. my favorite ( sticky rice ) came in second. i will rate what we ordered : egg rolls - average. opart beef - well seasoned, taste a little gamey to me. panang curry w / shrimp - good. combo fried ride - less than average. need more flavor it wasn't bad, but we won't be back.",
+    "positive_text": "we decided to go here because the 2011 reader poll named this restaurant the best thai food in chicago. my favorite ( sticky rice ) came in second. i will rate what we ordered : egg rolls - average. opart beef - well seasoned, taste a little gamey to me. panang curry w / shrimp - good. combo fried ride [MASK] less than average. need more flavor it wasn't bad, but we won't be back.",
+    "negative_text": "we decided to [MASK] here because the 2011 reader poll named this restaurant the best thai food in chicago. my favorite ( sticky rice ) came in second. i will rate what we ordered : egg rolls - average. opart beef - well seasoned, taste a little gamey to me. panang curry w / shrimp - good. combo fried ride - less than average. need more flavor it wasn't bad, but we won't be back.",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "so it gets another star with the update. we were up early this past weekend, and decided to give it one more try since we could beat the rush. the service was very quick and kind, however the food was incredibly bland. generous portions, too generous. my husband hated his benedict, and my entree was blah. tables were close together, there was only one stall in the bathroom, and the coffee service was a bit sluggish. nice marketing and fresh food, but i feel no need to return.",
+    "positive_text": "so it gets another star with the update. we were up early this past weekend, and decided to give it one more try since we could beat the rush. the service was very quick and kind, however the food was incredibly bland. generous [MASK], too generous. my husband hated his benedict, and my entree was blah. tables were close together, there was only one stall in the bathroom, and the coffee service was a bit sluggish. nice marketing and fresh food, but i feel no need to return.",
+    "negative_text": "[MASK] it gets another star with the update. we were up early this past weekend, and decided to give it one more try since we could beat the rush. the service was very quick and kind, however the food was incredibly bland. generous portions, too generous. my husband hated his benedict, and my entree was blah. tables were close together, there was only one stall in the bathroom, and the coffee service was a bit sluggish. nice marketing and fresh food, but i feel no need to return.",
+    "triplet_sample_mask": false
+  }
+]

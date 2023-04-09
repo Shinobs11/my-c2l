@@ -33,13 +33,14 @@ def generateTiplets(
   dropout_ratio: float = 0.5,
   max_masking_attempts: int = 0,
   sampling_ratio: int = 1,
-  augment_ratio: int = 1
+  augment_ratio: int = 1,
+  use_wandb: bool = True,
 ):
   batch_size = 1
   DATASET_NAME = dataset_name
   DATASET_PATH = f"datasets/{DATASET_NAME}/base"
   OUTPUT_PATH = f"checkpoints/{DATASET_NAME}/model"
-  TRIPLETS_PATH = f"datasets/{DATASET_NAME}/augmented_triplets"
+  TRIPLETS_PATH = f"datasets/{DATASET_NAME}/cl"
   SAMPLE_PATH = f"samples/{DATASET_NAME}"
   #! convert these into arguments
   TOPK_NUM = topk_num
@@ -68,16 +69,10 @@ def generateTiplets(
 
   device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-  train_set = pload(os.path.join(DATASET_PATH, "train_set"))
-
-  train_texts = train_set["text"].tolist()
-  train_labels = train_set["label"].tolist()
-
-
-
-
-  train_encodings = tokenizer(train_texts, padding=True, truncation=True)
-  train_dataset = ClassificationDataset(labels=train_labels, encodings=train_encodings)
+  dataset = torch.load(os.path.join(DATASET_PATH, 'dataset.pt'))
+  
+  train_texts = dataset['train_text']
+  train_dataset = dataset['train']
 
   train_loader = DataLoader(
     train_dataset,
@@ -269,8 +264,8 @@ def generateTiplets(
         triplets.append((label, orig_sample, causal_masked_sample, noncausal_masked_sample, err_flag, maximum_score))
     print(f"Error count: {error_count}")
     print(f"Flip count: {len(data_loader) - no_flip_count}")
-
-    wandb.log({"flip count": (len(data_loader) - no_flip_count), "percentage flipped": (len(data_loader) - no_flip_count)/len(data_loader) * 100})
+    if use_wandb:
+      wandb.log({"flip count": (len(data_loader) - no_flip_count), "percentage flipped": (len(data_loader) - no_flip_count)/len(data_loader) * 100})
 
       
     return triplets, no_flip_index
