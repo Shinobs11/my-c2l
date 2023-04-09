@@ -30,7 +30,7 @@ from src.classes.model import BertForCounterfactualRobustness
 from src.logging import log_memory
 from src.proecssing import correct_count
 from src.utils.pickleUtils import pdump, pload
-
+from src.configs.bert_config import bert_config
 
 def set_determinism(seed: int):
   torch.manual_seed(seed)
@@ -50,7 +50,7 @@ def load_datasets(dataset_name: str, use_cl: bool):
   return train_dataset, valid_dataset
 
 def load_model(lr: float, num_classes: int, train_size: int, epoch_num: int,  device: torch.device):
-  model:torch.nn.Module = BertForCounterfactualRobustness.from_pretrained('bert-base-uncased', num_labels=num_classes).to(device)  # type: ignore
+  model:torch.nn.Module = BertForCounterfactualRobustness.from_pretrained('bert-base-uncased', ignore_mismatched_sizes=True, config=bert_config).to(device)  # type: ignore
   optim = torch.optim.AdamW(model.parameters(), lr=lr)
   warmup = get_linear_schedule_with_warmup(optim, num_warmup_steps=50, num_training_steps=train_size*epoch_num)
   reduce_lr = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode='min', factor=0.5, patience=3, verbose=True)

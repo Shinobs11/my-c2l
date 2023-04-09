@@ -48,8 +48,8 @@ def main():
       # lambda_weight=wandb.config.lambda_weight,
       # lr=wandb.config.lr,
       dataset_name=dataset_name,
-      batch_size=2,
-      epoch_num=2,
+      batch_size=8,
+      epoch_num=12,
       use_pinned_memory=False,
       lambda_weight=0.1,
       lr=5e-5,
@@ -82,21 +82,21 @@ def main():
 
   # triplets()
 
-  def cl():
-    gc.collect()
-    torch.cuda.empty_cache()
-    train_model(
-      dataset_name=dataset_name,
-      batch_size=2,
-      epoch_num=2,
-      use_pinned_memory=False,
-      lr=5e-5,
-      lambda_weight=0.0,
-      use_cl=True,
-      use_wandb=False
-    )
+  # def cl():
+  #   gc.collect()
+  #   torch.cuda.empty_cache()
+  #   train_model(
+  #     dataset_name=dataset_name,
+  #     batch_size=2,
+  #     epoch_num=2,
+  #     use_pinned_memory=False,
+  #     lr=5e-5,
+  #     lambda_weight=0.0,
+  #     use_cl=True,
+  #     use_wandb=False
+  #   )
 
-  cl()
+  # cl()
 
   #   #contrastive training
   # def cl():
@@ -144,12 +144,11 @@ if __name__=="__main__":
   
   
     TOKEN_LIMIT = 128
-    TRAIN_SIZE = 100
-    TEST_SIZE = 20
+    TRAIN_SIZE = 800
+    TEST_SIZE = 400
     DATASET_PATH = f"./datasets/{dataset_name}"
     if os.path.exists(os.path.join(DATASET_PATH, "dataset_meta.pt")):
       dataset_meta = torch.load(os.path.join(DATASET_PATH, "dataset_meta.pt"))
-      print(dataset_meta)
       if  dataset_meta["token_limit"] != TOKEN_LIMIT or \
           dataset_meta["train_size"] != TRAIN_SIZE or \
           dataset_meta["test_size"] != TEST_SIZE:
