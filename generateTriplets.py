@@ -149,6 +149,7 @@ def generateTiplets(
     importance_sum = torch.zeros((VOCAB_SIZE,), dtype=torch.float64).to(device)
     importance_count = torch.zeros((VOCAB_SIZE,), dtype=torch.int32).to(device)
     total_count = 0
+    torch.use_deterministic_algorithms(False)
     for importances, batch in tqdm(zip(all_importances, data_loader)):
       for importance, item in zip(importances, batch['input_ids'].to(device)):
         m = max(item) + 1
@@ -159,6 +160,7 @@ def generateTiplets(
       total_count += batch['input_ids'].shape[0]
     averaged_importances = importance_sum/importance_count
     all_ave_token_importance = []
+    torch.use_deterministic_algorithms(True)
     for batch in tqdm(data_loader):
       ave_token_imp_batch = []
       m = batch['input_ids'].shape[0]
