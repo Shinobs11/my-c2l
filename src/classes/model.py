@@ -114,13 +114,13 @@ class BertForCounterfactualRobustness(BertForSequenceClassification):
       
       if triplet_sample_masks is None:
         triplet_loss = triplet_loss_func(anchor_outputs[1], positive_outputs[1], negative_outputs[1])
-        # triplet_loss = triplet_loss_func(anchor_outputs[1], anchor_outputs[1], anchor_outputs[1])
-        loss = loss + lambda_weight * triplet_loss
+        loss = loss + 0.0 * triplet_loss
+        pass
       else:
         if torch.sum(triplet_sample_masks):
           triplet_loss = triplet_loss_func(anchor_outputs[1][triplet_sample_masks], positive_outputs[1][triplet_sample_masks], negative_outputs[1][triplet_sample_masks])
-          # triplet_loss = triplet_loss_func(anchor_outputs[1][triplet_sample_masks], anchor_outputs[1][triplet_sample_masks], anchor_outputs[1][triplet_sample_masks])
-          loss = loss + lambda_weight * triplet_loss
+          loss = loss + 0.0 * triplet_loss
+          pass
     
 
 

@@ -9,8 +9,8 @@ import os
 
 #for CHI, review being fake is Y or 0, N or 1
 
-TRAIN_SIZE = 400
-TEST_SIZE = 100
+TRAIN_SIZE = 100
+TEST_SIZE = 25
 
 yelp_chi_train = pd.read_csv("datasets/yelp_chi/yelp_chi_train.csv", index_col = 0).reset_index(drop=True)[0:TRAIN_SIZE]
 yelp_chi_test = pd.read_csv("datasets/yelp_chi/yelp_chi_test.csv", index_col = 0).reset_index(drop=True)[0:TEST_SIZE]
