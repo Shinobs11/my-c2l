@@ -83,28 +83,28 @@ class BertForCounterfactualRobustness(BertForSequenceClassification):
           loss = loss_fct(logits, labels)
           
     if positive_input_ids is not None and negative_input_ids is not None and labels is not None:
-      # positive_outputs = self.bert(
-      #   positive_input_ids,
-      #   attention_mask=positive_attention_mask,
-      #   token_type_ids=positive_token_type_ids,
-      #   position_ids=position_ids,
-      #   head_mask=head_mask,
-      #   inputs_embeds=inputs_embeds,
-      #   output_attentions=output_attentions,
-      #   output_hidden_states=output_hidden_states,
-      #   return_dict=return_dict,
-      # )
-      # negative_outputs = self.bert(
-      #     negative_input_ids,
-      #     attention_mask=negative_attention_mask,
-      #     token_type_ids=negative_token_type_ids,
-      #     position_ids=position_ids,
-      #     head_mask=head_mask,
-      #     inputs_embeds=inputs_embeds,
-      #     output_attentions=output_attentions,
-      #     output_hidden_states=output_hidden_states,
-      #     return_dict=return_dict,
-      # )
+      positive_outputs = self.bert(
+        positive_input_ids,
+        attention_mask=positive_attention_mask,
+        token_type_ids=positive_token_type_ids,
+        position_ids=position_ids,
+        head_mask=head_mask,
+        inputs_embeds=inputs_embeds,
+        output_attentions=output_attentions,
+        output_hidden_states=output_hidden_states,
+        return_dict=return_dict,
+      )
+      negative_outputs = self.bert(
+          negative_input_ids,
+          attention_mask=negative_attention_mask,
+          token_type_ids=negative_token_type_ids,
+          position_ids=position_ids,
+          head_mask=head_mask,
+          inputs_embeds=inputs_embeds,
+          output_attentions=output_attentions,
+          output_hidden_states=output_hidden_states,
+          return_dict=return_dict,
+      )
       
       triplet_loss = None
       triplet_loss_func = torch.nn.TripletMarginLoss()
@@ -113,15 +113,13 @@ class BertForCounterfactualRobustness(BertForSequenceClassification):
         lambda_weight = 0.1
       
       if triplet_sample_masks is None:
-        # triplet_loss = triplet_loss_func(anchor_outputs[1], positive_outputs[1], negative_outputs[1])
-        # triplet_loss = triplet_loss_func(anchor_outputs[1], anchor_outputs[1], anchor_outputs[1])
-        # loss = loss + 0.0 * triplet_loss
+        triplet_loss = triplet_loss_func(anchor_outputs[1], positive_outputs[1], negative_outputs[1])
+        loss = loss + 0.0 * triplet_loss
         pass
       else:
         if torch.sum(triplet_sample_masks):
-          # triplet_loss = triplet_loss_func(anchor_outputs[1][triplet_sample_masks], positive_outputs[1][triplet_sample_masks], negative_outputs[1][triplet_sample_masks])
-          # triplet_loss = triplet_loss_func(anchor_outputs[1][triplet_sample_masks], anchor_outputs[1][triplet_sample_masks], anchor_outputs[1][triplet_sample_masks])
-          # loss = loss + 0.0 * triplet_loss
+          triplet_loss = triplet_loss_func(anchor_outputs[1][triplet_sample_masks], positive_outputs[1][triplet_sample_masks], negative_outputs[1][triplet_sample_masks])
+          loss = loss + 0.0 * triplet_loss
           pass
     
 
