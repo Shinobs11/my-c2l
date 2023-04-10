@@ -1,0 +1,482 @@
+[
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "i do love lomzynianka. i am even going to go as far as to say that it is my favorite restaurant in the city because it's so consistent, close to my home, wonderfully cheap, and charmingly casual. oh, and it's also just good. i have yet to find a better polish restaurant in the'hood, though i've tried. yelp's right on this one. i recommend for the vegetarians the vegetable borscht, the potato & cheese pierogies, and the sauerkraut. my carnivorous friends swear by the hungarian pie.",
+    "positive_text": "i do love lomzynianka. [MASK] am even going to go as far as to say that it is my favorite restaurant in the city because it's so consistent, close to my home, wonderfully cheap [MASK] and charming [MASK] casual. oh, and it's also just good. i have yet to [MASK] a better [MASK] restaurant in the'hood, though i've tried. yelp's right on this one. i recommend for the vegetarians the vegetable borscht, the potato [MASK] cheese pierogies, and the sauerkraut. my [MASK]nivorous friends swear by the hungarian [MASK].",
+    "negative_text": "i do love lomzynianka. i am even going to go as far as to say that it is my favorite restaurant in the city because it's so consistent, close to my home, wonderfully cheap, and charmingly casual. oh, and it's also just good. i have yet to find a better polish restaurant in the'hood, though i've tried. yelp's right on this one. i recommend for the vegetarians the vegetable borscht, the potato & cheese pierogies, and the sauerkraut. my carnivorous [MASK] swear by the hungarian pie.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "wow! best curry ever! i had a customized lamb curry and my friend had a beef curry, my lamb curry was not as spicy but it's so distinct it had raisin and almond. the garlic nan was fresh and great too! lastly, a mango sorbet was given to us as a gift!",
+    "positive_text": "wow! best curry ever! [MASK] had a customized lamb curry [MASK] my friend had a beef curry [MASK] my [MASK] curry [MASK] [MASK] as spicy but it's so distinct it had rai [MASK] and almond. the garlic nan was fresh and great too! lastly, [MASK] mango sorbet was given to us as a gift!",
+    "negative_text": "wow! best curry ever! i had a customized lamb curry and my friend had a beef curry, my lamb curry was not as spicy but it's so distinct it had raisin and almond. the garlic nan was fresh and great too! lastly [MASK] a mango sorbet was given to us as a gift!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "tucked away under the brooklyn bridge not far from the hubbub of south street seaport is this nondescript tex - mex seafood joint. went with a party of six and had a great time. bacon wrapped poppers were sensational. crab cake burgers were delicious. cocktails were good and fairly priced. apparently the po boys are great too. all this for under $ 40 a head. great value. oh, and the music pumps in here creating quite a raucous vibe. will definitely go back.",
+    "positive_text": "tucked away under the brooklyn bridge not far from the hubbub of south street seaport is this nondescript tex - mex seafood joint. went with a party of six and [MASK] a [MASK] time. bacon wrapped poppers [MASK] sensational. crab cake burgers were delicious. cocktail [MASK] were good and fairly priced. [MASK] the po boys are great too. all this for under $ 40 a head [MASK] great value. oh, [MASK] [MASK] music pumps in here creating quite a raucous vibe. will definitely [MASK] back.",
+    "negative_text": "tucked away under the brooklyn bridge not far from the hubbub of south street seaport is this nondescript tex - mex seafood joint. went with a party of six and had a great time. bacon wrapped poppers were sensational. crab cake burgers were delicious. cocktails were good and fairly priced. apparently the po boys are great too. all this for under $ 40 a head. great value. oh, and the music pumps [MASK] here creating quite a raucous vibe. will definitely go back.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "wonderful service, wonderful food, great prices... hands down the best indian food in the village. open late too!!",
+    "positive_text": "wonderful service, wonderful food, [MASK] prices. [MASK] [MASK] hands down the [MASK] indian [MASK] [MASK] the village [MASK] [MASK] late too!!",
+    "negative_text": "[MASK] service, wonderful food, great prices... hands down the best indian food in the village. open late too!!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "my friend wanted a french bistro for her birthday dinner, and la sirene didn't disappoint. the food was good, the fish fresh, and everything was done nicely. it didn't blow me away, but it was a good meal. we had the french onion soup, which was superb, and a salad to start, and each had a different fish special. the service was excellent, attentive without being intrusive.",
+    "positive_text": "my friend wanted a french bistro for her birthday dinner, and la [MASK]e didn't [MASK]sappoint. the food was good, [MASK] fish fresh, and everything was done nicely. it didn't blow me away, [MASK] it [MASK] a good meal. we had the french onion soup, which was superb [MASK] and a salad to start, and each had a different fish special. the service was [MASK], attentive without [MASK] intrusive.",
+    "negative_text": "my friend wanted a french bistro for her birthday dinner, and la sirene didn't disappoint. the food was good, the fish fresh, and everything was done nicely. it didn't blow me away, but it was a good meal. we had the french onion soup, which was superb, and a salad to start, and each had a different fish special. the service was excellent, attentive without being intrus [MASK].",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "happiness is a pulled pork sanwich. and tell me, people what is better than a menu that has a pulled pork sandwich and also features corn dogs and fries?!! both were dee - lish. not to mention the onion rings. oh, i'm going back all right! next time instead of one sandwich, i'm going with the server's recommendation of two. take that, skinny biatches! a complimentary shot of jameson rounded out the meal perfectly.",
+    "positive_text": "happiness is a pulled pork sanwich. and [MASK] me, people what is better than a menu that has a pulled [MASK] sandwich and also features corn dogs and [MASK] [MASK]!! both were dee - [MASK]sh. not to mention the onion rings. oh, i'm going back all [MASK]! next time instead of one sandwich [MASK] i'm going with the server'[MASK] recommendation of two. take that, skinny biatches! a complimentary shot of jameson rounded out the meal perfectly.",
+    "negative_text": "happiness is a pulled pork sanwich. and tell me, people what is better than a menu that has a pulled pork sandwich and also features corn dogs and fries?!! both were dee - lish. not to mention the onion rings. oh, i'm going back all right! next time instead of one sandwich, i'm going with the server's recommendation of two. take that, skinny biatches! a complimentary shot [MASK] jameson rounded out the meal perfectly.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "almost certainly the best pizza i've ever had in manhattan, and this is very odd because i had never heard of this place before i went there last night. why isn't this place talked about like the rest of the pantheon of top - flight new york pizza eateries? or maybe it is, and i'm just out of the loop. at any rate, you need to eat here.",
+    "positive_text": "almost [MASK] the best pizza i've ever had in manhattan, and this is very odd because i had never heard of this place before i went [MASK] last night. why isn [MASK] [MASK] [MASK] place talked about like the rest of the pantheon of top - flight new york pizza [MASK]ies [MASK] or maybe it is, and i'm just out of the loop. at any rate, [MASK] need to eat here.",
+    "negative_text": "[MASK] certainly the best pizza i've ever had in manhattan, and this is very odd because i had never heard of this place before i went there last night. why isn't this place talked about like the rest of the pantheon of top - flight new york pizza eateries? or maybe it is, and i'm just out of the loop. at any rate, you need to eat here.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "we had dinner here with friends. i got the lobster ravioli special and quite enjoyed it. we had good service by the entire staff. everyone one in my party enjoyed their meal. i would recommend this place to anyone looking for a good meal by the park.",
+    "positive_text": "we had dinner here with [MASK] [MASK] i got the lobster ravioli special and quite [MASK] it [MASK] we had good service by the entire staff. everyone one in my [MASK] enjoyed their meal. i would [MASK] this [MASK] [MASK] [MASK] looking for a good meal by the park.",
+    "negative_text": "[MASK] had dinner here with friends. i got the lobster ravioli special and quite enjoyed it. we had good service by the entire staff. everyone one in my party enjoyed their meal. i would recommend this place to anyone looking for a good meal by the park.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "made arrangements with the bar to host a going away party. a few days before the event i was told that they did not feel comfortable reserving the area and made us cancel the reservation. the owner had a terrible attitude when she should have been compassionate. my colleagues and i will surely no longer go to this venue.",
+    "positive_text": "made arrangements [MASK] the bar to host a going away party. a few days before the event i was told that they did not feel comfortable reserving the area and made us cancel the [MASK]. the [MASK] [MASK] a [MASK] attitude when she should have been compassionate. my colleagues and i will [MASK] [MASK] [MASK] go to this venue.",
+    "negative_text": "[MASK] arrangements with the bar to host a going away party. a few days before the event i was told that they did not feel comfortable reserving the area and made us cancel the reservation. the owner had a terrible attitude when she should have been compassionate. my colleagues and i will surely no longer go to this venue.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "they would have 5 stars if they had a vegetarian rice option. but overall reminds me of home in the bay!! we needed dos toros!",
+    "positive_text": "they [MASK] have 5 [MASK] if they had a vegetarian rice option [MASK] [MASK] overall [MASK] me of home [MASK] the bay [MASK]! we needed dos toro [MASK]!",
+    "negative_text": "[MASK] would have 5 stars if they had a vegetarian rice option. but overall reminds me of home in the bay!! we needed dos toros!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "have heard a lot about carmine's - perhaps too much build - up? salad was the best part of the meal. pasta with meatballs was fine, but not better than the many smaller italian places nearby. would not go back with so many other options in the area, but could be fun with kids.",
+    "positive_text": "have heard a lot about [MASK]'[MASK] - perhaps too much [MASK] - up? salad was the best part [MASK] the meal. pasta with meatballs was fine, but not better than the many smaller italian places nearby. [MASK] not go back with [MASK] many other options in [MASK] area, but could [MASK] fun with kids.",
+    "negative_text": "[MASK] heard a lot about carmine's - perhaps too much build - up? salad was the best part of the meal. pasta with meatballs was fine, but not better than the many smaller italian places nearby. would not go back with so many other options in the area, but could be fun with kids.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "pros : friendly staff. good space. good food. we order four plates and all of them were pretty good except the oxtail. it was too dry. cons : it took them literally 35 - 40 minutes to prepare our food ( 4 plates ). horrible music. really under staff note : they have small portions, so make sure to order at least 2 - 3 plates per person.",
+    "positive_text": "pros : friendly [MASK]. good space. good food. we order [MASK] plates [MASK] all of them were [MASK] good except [MASK] oxtail. it was too dry. cons : it took them literally 35 - 40 minutes to prepare our food ( 4 plates ). [MASK] music. really under staff [MASK] : they have small portions, so make sure to order at least 2 - 3 plates [MASK] person [MASK]",
+    "negative_text": "[MASK]s : friendly staff. good space. good food. we order four plates and all of them were pretty good except the oxtail. it was too dry. cons : it took them literally 35 - 40 minutes to prepare our food ( 4 plates ). horrible music. really under staff note : they have small portions, so make sure to order at least 2 - 3 plates per person.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "all around good and tasty comfort food. love this place and plan on coming back again soon!",
+    "positive_text": "all [MASK] good and [MASK]sty [MASK] food. love [MASK] place and plan on coming back [MASK] [MASK]!",
+    "negative_text": "[MASK] around good and tasty comfort food. love this place and plan on coming back again soon!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "little vegetarian selection and really like any other chinese joint i've been to.",
+    "positive_text": "little [MASK] selection [MASK] [MASK] [MASK] any other chinese joint i [MASK] ve been [MASK].",
+    "negative_text": "[MASK] vegetarian selection and really like any other chinese joint i've been to.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "awesome little spot! had the chicken kabob sandwich, and though disappointed they didn't have any sauces, the owner ( very nice guy btw ) insisted that the chicken was marinated and the sauce would only serve to distract. he was right! the chicken is juicy and marinated to perfection, and the lettuce lightly dressed with oil. the bread was also very fresh. i definitely plan on going back!",
+    "positive_text": "awesome [MASK] spot [MASK] had the chicken kabob sandwich [MASK] and though disappointed they didn't have any sauce [MASK], [MASK] owner ( very nice guy btw ) insisted that the chicken was marinated and the sauce would [MASK] serve to distract. he was right! the chicken is juicy and marina [MASK] [MASK] perfection, and the lettuce lightly dressed with oil. the [MASK] was also very fresh. i definitely plan on going back!",
+    "negative_text": "[MASK] little spot! had the chicken kabob sandwich, and though disappointed they didn't have any sauces, the owner ( very nice guy btw ) insisted that the chicken was marinated and the sauce would only serve to distract. he was right! the chicken is juicy and marinated to perfection, and the lettuce lightly dressed with oil. the bread was also very fresh. i definitely plan on going back!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "first time visiting this place and most likely will be our last! the food is decent but the service is really bad! we order the oyster and they had sand on them! we also order the lobster mac & cheese as an appetizer but didn't try them because our entree came first to the table so we cancel the order! the lobster roll were good but nothing to rave about!",
+    "positive_text": "first time visiting this place and most likely will be our last! the food [MASK] decent but the service is [MASK] bad! we order the oyster [MASK] they had sand on them! we [MASK] order the lobster mac & [MASK] as an appeti [MASK] but didn'[MASK] try them because our entree came first to the table [MASK] we cancel the order [MASK] the lobster roll were good but nothing to rave about!",
+    "negative_text": "[MASK] time visiting this place and most likely will be our last! the food is decent but the service is really bad! we order the oyster and they had sand on them! we also order the lobster mac & cheese as an appetizer but didn't try them because our entree came first to the table so we cancel the order! the lobster roll were good but nothing to rave about!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "by far best sushi in nyc.",
+    "positive_text": "by [MASK] [MASK] [MASK] [MASK] [MASK] nyc [MASK]",
+    "negative_text": "[MASK] far best sushi in nyc.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "the best rice & beans in town!",
+    "positive_text": "the [MASK] rice [MASK] [MASK] in town [MASK]",
+    "negative_text": "[MASK] best rice & beans in town!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "food is very very good and interesting. a must to try. no reservations but the wait was fun outside. service was good but a bit rough, but no biggy. staff friendly. bit crowded and noisy but that's what it's all about. will go back.",
+    "positive_text": "food is very very good and interesting. a must to try. no [MASK] but the wait was fun [MASK]. service was good [MASK] a bit rough, but [MASK] biggy. staff friendly. bit [MASK] and [MASK] but [MASK]'s what [MASK]'s all about [MASK] will go back.",
+    "negative_text": "[MASK] is very very good and interesting. a must to try. no reservations but the wait was fun outside. service was good but a bit rough, but no biggy. staff friendly. bit crowded and noisy but that's what it's all about. will go back.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "love this place some of the best italian food around",
+    "positive_text": "love [MASK] place [MASK] [MASK] the best italian food [MASK]",
+    "negative_text": "[MASK] this place some of the best italian food around",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "i went there for a brunch and it was really delicious. simple american with fresh ingredients and not too heavy or salty. very well balanced dish overall. the buttermilk pancakes were delicious but not stellar. slightly under seasoned and bland, but liked the fact that it was light and not too sweet. definitely will go back soon.",
+    "positive_text": "i went there for a [MASK]unch and it was really [MASK]. simple [MASK] with [MASK] ingredients and not too heavy or salty [MASK] very well balanced dish [MASK]. the buttermilk pancakes were delicious but not stellar. slightly under seasoned and bland, but liked the fact [MASK] it was light [MASK] not too sweet. [MASK] will go back soon.",
+    "negative_text": "[MASK] went there for a brunch and it was really delicious. simple american with fresh ingredients and not too heavy or salty. very well balanced dish overall. the buttermilk pancakes were delicious but not stellar. slightly under seasoned and bland, but liked the fact that it was light and not too sweet. definitely will go back soon.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "i had the fried chicken with rice & peas. great. rice was fresh & they injected seasoning in the meat before they cooked it, resulting in a flavorful spicy chicken. the jerk chicken is also great too",
+    "positive_text": "i had the fried chicken with rice [MASK] peas. great. rice was fresh & they [MASK] seasoning [MASK] the [MASK] before they cooked [MASK], resulting in a flavorful [MASK] [MASK]. the [MASK] chicken is also [MASK] too",
+    "negative_text": "[MASK] had the fried chicken with rice & peas. great. rice was fresh & they injected seasoning in the meat before they cooked it, resulting in a flavorful spicy chicken. the jerk chicken is also great too",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "very delicious olives appetizer with perfectly baked bread. the most delicious south african shiraz for $ 16 dollars a glass. four stars because of service, even though it wasn't busy an late, the waitress rushed us with the check, as soon as we were done with our meal. the bartender is great. i would recommend this place for people who wants to finish their day with good glass of wine.",
+    "positive_text": "very delicious olives appetizer with perfectly baked bread. the most [MASK] south african shiraz [MASK] $ 16 dollars a glass [MASK] four stars because of service, [MASK] though it wasn't busy an late [MASK] [MASK] waitress rushed us with the check, as soon as we were done with [MASK] meal. the bartender is great. i would recommend this place for people [MASK] wants to finish their day with good [MASK] of wine.",
+    "negative_text": "[MASK] delicious olives appetizer with perfectly baked bread. the most delicious south african shiraz for $ 16 dollars a glass. four stars because of service, even though it wasn't busy an late, the waitress rushed us with the check, as soon as we were done with our meal. the bartender is great. i would recommend this place for people who wants to finish their day with good glass of wine.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "this place is number one on our neighborhood brunch list right now. the french style soft omelette with roasted tomatoes, caramelized onion and goat cheese is amazing! we're vegetarian so we also loved the beet, avocado and goat cheese sandwich. i'm guessing the meat options are tip top too.",
+    "positive_text": "this place [MASK] number [MASK] on our neighborhood brunch list [MASK] now. the french style soft omelette with roasted tomatoes [MASK] caramelized onion and goat cheese is amazing! [MASK]'re [MASK] so we also loved the [MASK]t, avocado and goat cheese sandwich [MASK] i'm guessing the meat [MASK] are tip top too.",
+    "negative_text": "[MASK] place is number one on our neighborhood brunch list right now. the french style soft omelette with roasted tomatoes, caramelized onion and goat cheese is amazing! we're vegetarian so we also loved the beet, avocado and goat cheese sandwich. i'm guessing the meat options are tip top too.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "corn. get it. the end. ps. such a fan fan fan!",
+    "positive_text": "[MASK]. get it [MASK] [MASK] [MASK] [MASK] ps [MASK] such [MASK] [MASK] fan fan!",
+    "negative_text": "corn. get it. the end. [MASK]. such a fan fan fan!",
+    "triplet_sample_mask": false
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "thought this place would be another tourist trap. after seeing it on the gothamist i decided to visit with a friend. mostly community style seating, but not too uncomfortable for a hectic saturday night. ale selections were vast and unique. i tried the refreshing crispin ale & the server even made an effort to provide it with an adorable mason jar for convenience. the speckenwolf & famous original were both so delicious. dont forget to ask your server for their daily special. what a great place to enjoy quality ny pizza fresh from the oven to your table. can't wait to come back!",
+    "positive_text": "thought this place [MASK] be another tourist trap. after seeing it on the gothamist i decided to visit with a friend. mostly community style seating [MASK] [MASK] not too uncomfortable for a hectic saturday [MASK]. ale selections were vast and unique. i tried the refreshing crispin ale & the server even made an effort to provide it with an adorable mason jar for convenience. the speckenwolf & famous original were both so delicious [MASK] dont forget to ask [MASK] server for their daily special. what a great place to enjoy quality ny [MASK] fresh from [MASK] oven to your [MASK]. can't wait to come back!",
+    "negative_text": "[MASK] this place would be another tourist trap. after seeing it on the gothamist i decided to visit with a friend. mostly community style seating, but not too uncomfortable for a hectic saturday night. ale selections were vast and unique. i tried the refreshing crispin ale & the server even made an effort to provide it with an adorable mason jar for convenience. the speckenwolf & famous original were both so delicious. dont forget to ask your server for their daily special. what a great place to enjoy quality ny pizza fresh from the oven to your table. can't wait to come back!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "had brunch there - - good service, great ambiance. portions are big and hearty. arturo pizza ( $ 14 ) features jalepenos, avocados, chorizo, and cheese, and is delicious! (!!! ) shrimp and grits feature some of the best grits i've had in nyc. great deal.",
+    "positive_text": "had brunch there - - good service, great ambiance. portions are big and hearty [MASK] arturo pizza [MASK] $ 14 ) features ja [MASK]penos, avoca [MASK], chorizo, and cheese, and is [MASK]! (!! [MASK] ) [MASK] and grits feature some of the best grits i've [MASK] in nyc. great deal.",
+    "negative_text": "[MASK] brunch there - - good service, great ambiance. portions are big and hearty. arturo pizza ( $ 14 ) features jalepenos, avocados, chorizo, and cheese, and is delicious! (!!! ) shrimp and grits feature some of the best grits i've had in nyc. great deal.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "the most gorgeous view and delicious view to boot! call ahead and ask to be seated at a window.",
+    "positive_text": "the most gorgeous view [MASK] delicious view to [MASK]! [MASK] ahead and [MASK] to [MASK] seated at a [MASK].",
+    "negative_text": "[MASK] most gorgeous view and delicious view to boot! call ahead and ask to be seated at a window.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "best korean food, kimchi here is the best in the world",
+    "positive_text": "best korean [MASK] [MASK] kimchi [MASK] is [MASK] best [MASK] [MASK] [MASK]",
+    "negative_text": "[MASK] korean food, kimchi here is the best in the world",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "uva is a great place for a first date. the atmosphere is extremely romantic. for a more detailed review, please click the link below : halsteadproperty. tumblr. \u2026",
+    "positive_text": "uv [MASK] is a great place [MASK] a first date. the [MASK] is extremely romantic. [MASK] a more detailed review, please click [MASK] link below : halsteadproperty [MASK] [MASK]mb [MASK]. \u2026",
+    "negative_text": "[MASK]a is a great place for a first date. the atmosphere is extremely romantic. for a more detailed review, please click the link below : halsteadproperty. tumblr. \u2026",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "great food and good attentive waiter nick. had steak and tomatoes and pear and ice cream dessert. both great.",
+    "positive_text": "great food [MASK] good [MASK] [MASK]tive waiter nick [MASK] had steak and tomatoes and pear and [MASK] [MASK] dessert. [MASK] great.",
+    "negative_text": "[MASK] food and good attentive waiter nick. had steak and tomatoes and pear and ice cream dessert. both great.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "amazing food, great management. fish is always great with the side it comes with. fresh home made whisky pound cake is a great light finish to the great launch or dinner there. only if people stop going there so we can always have a sit ; would be great.",
+    "positive_text": "amazing food, great [MASK]. fish is always great with the side it comes with. fresh home made whisky pound cake is a great [MASK] finish to the [MASK] [MASK] or dinner [MASK]. [MASK] if people stop [MASK] there so we can always have a sit ; [MASK] [MASK] great.",
+    "negative_text": "[MASK] food, great management. fish is always great with the side it comes with. fresh home made whisky pound cake is a great light finish to the great launch or dinner there. only if people stop going there so we can always have a sit ; would be great.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "2 + years later, and another 4 star review. food is good, but not worth waiting 2 + hours for if you arrive at 1pm. they do use buzztable, so you can check your wait status on the app - which is kind of fun!",
+    "positive_text": "2 + years [MASK], and [MASK] 4 star review. food is [MASK], but not worth [MASK] [MASK] + [MASK] for if you arrive at 1pm. [MASK] do use buzztable, so you [MASK] check your wait status on the [MASK] - which is kind of fun!",
+    "negative_text": "[MASK] + years later, and another 4 star review. food is good, but not worth waiting 2 + hours for if you arrive at 1pm. they do use buzztable, so you can check your wait status on the app - which is kind of fun!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "this place serves up a mean steak and fantastic lobster salad. i think that there's pretty good service, but it really depends on who you get. the place is typically known for brunch, but it's not the ideal spot to take a date to. it's a little bit loud on the weekends, the ambiance isn't exactly romantic. i could imagine people primarily coming here for casual meetings with friends or business acquantices. overall, pretty good place to find quality french cooking.",
+    "positive_text": "this place serves up a mean steak and fantastic lobster salad. i think that there's [MASK] good service, but [MASK] really depends on who you get. [MASK] place is typically known for brunch [MASK] but it's not the ideal spot to take a date to. it's a little bit loud on the weekends, the [MASK]biance isn't exactly romantic. [MASK] could imagine people primarily coming here for casual meetings [MASK] friends or business acqua [MASK]ces. overall, pretty good place to find quality french cooking.",
+    "negative_text": "[MASK] place serves up a mean steak and fantastic lobster salad. i think that there's pretty good service, but it really depends on who you get. the place is typically known for brunch, but it's not the ideal spot to take a date to. it's a little bit loud on the weekends, the ambiance isn't exactly romantic. i could imagine people primarily coming here for casual meetings with friends or business acquantices. overall, pretty good place to find quality french cooking.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "i go there every week.. just because of best tacos ever.",
+    "positive_text": "i go [MASK] [MASK] [MASK].. [MASK] [MASK] of [MASK] ta [MASK] [MASK] [MASK]",
+    "negative_text": "[MASK] go there every week.. just because of best tacos ever.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "fabulous - food, atmosphere, wine, service ( alan was our server and he is great ). after living in the middle east, can say with certainty that the kebab was perfect! so were the brussels sprouts, pulled lamb, massaya wine, modern mashrabiya decor, etc. and priced right!",
+    "positive_text": "fabulous [MASK] food, atmosphere, wine, service ( alan was our server and he is [MASK] ). after living [MASK] the middle [MASK], can say [MASK] certainty that the kebab was [MASK]! so were the brussels sprouts, [MASK] lamb, massaya wine, modern mashrabiya [MASK], etc. and [MASK] right!",
+    "negative_text": "[MASK] - food, atmosphere, wine, service ( alan was our server and he is great ). after living in the middle east, can say with certainty that the kebab was perfect! so were the brussels sprouts, pulled lamb, massaya wine, modern mashrabiya decor, etc. and priced right!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "my diet is very fortunate the line to heaven is sooooo long.",
+    "positive_text": "my diet is very [MASK] [MASK] line to [MASK] [MASK] soooo [MASK] long [MASK]",
+    "negative_text": "[MASK] diet is very fortunate the line to heaven is sooooo long.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "ate here for lunch. was seated immediately. ordered all reccomendations of the waiter. curries were amazing!! wonderful.",
+    "positive_text": "ate [MASK] for lunch. was seated immediately [MASK] [MASK] all reccomend [MASK] of the waiter [MASK] currie [MASK] [MASK] amazing! [MASK] [MASK].",
+    "negative_text": "[MASK] here for lunch. was seated immediately. ordered all reccomendations of the waiter. curries were amazing!! wonderful.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "add another to the ever - growing beer scene in hell's kitchen. virtually empty in the afternoon, a seat at the bar in front of a tv is pretty easy. bartender was friendly and patient while i was going through the happy hour menu. it's expensive, but a solid pour for happy hour ( around $ 5 - 8 ). didn't get food, but looks to be a fancy version of bar food. nothing really stood out, as i was content with my beer. apparently they have tap takeovers every so often ; would come for one of those.",
+    "positive_text": "add another to the ever - growing beer scene in hell's kitchen. [MASK] empty in the afternoon, a seat at the bar [MASK] front of a tv is pretty [MASK]. bartender was [MASK] and patient while i was [MASK] through the happy hour menu. it's expensive, but [MASK] solid pour for happy hour ( around $ [MASK] - 8 ). didn't get food, [MASK] looks to be a fancy version of bar food. nothing really stood out, as [MASK] was content with my beer. apparently they have tap takeovers every so often ; would come for one of those.",
+    "negative_text": "[MASK] another to the ever - growing beer scene in hell's kitchen. virtually empty in the afternoon, a seat at the bar in front of a tv is pretty easy. bartender was friendly and patient while i was going through the happy hour menu. it's expensive, but a solid pour for happy hour ( around $ 5 - 8 ). didn't get food, but looks to be a fancy version of bar food. nothing really stood out, as i was content with my beer. apparently they have tap takeovers every so often ; would come for one of those.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "good ambience and food",
+    "positive_text": "good ambie [MASK] [MASK] [MASK]",
+    "negative_text": "[MASK] ambience and food",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "food is awsome! my family and i have been coming here for many years. everyone is so nice and welcoming. tea is always on the table ready for you and your order comes so fast! food is so delicious and fresh. the roti cannai is obviously everyone's favorite but the pad tai omg out of this world!!! also they always let you know how spicy ( or not ) you want the food. love love love this place!",
+    "positive_text": "food [MASK] awsome! my [MASK] and [MASK] [MASK] been coming here for [MASK] years. everyone is so nice and welcoming. tea is always on the table ready for you and your order comes so fast! food is so delicious and fresh. the roti cannai is obviously everyone's favorite but the pad tai [MASK]g out of this world!!! also they [MASK] let you know how spicy ( [MASK] not ) you [MASK] the food. love love love this place!",
+    "negative_text": "[MASK] is awsome! my family and i have been coming here for many years. everyone is so nice and welcoming. tea is always on the table ready for you and your order comes so fast! food is so delicious and fresh. the roti cannai is obviously everyone's favorite but the pad tai omg out of this world!!! also they always let you know how spicy ( or not ) you want the food. love love love this place!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "food is sooooooo good! bartender is very nice!",
+    "positive_text": "food is [MASK]oooo [MASK] [MASK]! [MASK] is very [MASK] [MASK]",
+    "negative_text": "[MASK] is sooooooo good! bartender is very nice!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "very good! i'm a huge persian / mediterenian / middle easter foodie and i have to say this place surprised me and surpassed all of my expectations. i've had their lamb shawerma, which is juicy and tasty! their okra, hummus, babaganoush, mousakaha spinch pie - yum yum yum. i'm a huge fan, and they deliver + take credit cards.",
+    "positive_text": "very good! i'm a huge persian / mediterenian / middle easter foodie [MASK] i have to say this place surprised me and surpassed all [MASK] my expectations. [MASK]'ve had their lamb shawerma [MASK] which is juicy and tasty! [MASK] ok [MASK], [MASK]mus, [MASK]ganoush, mousakaha spinch pie - yum yum yum. i'm a huge fan, and they deliver + take credit cards.",
+    "negative_text": "[MASK] good! i'm a huge persian / mediterenian / middle easter foodie and i have to say this place surprised me and surpassed all of my expectations. i've had their lamb shawerma, which is juicy and tasty! their okra, hummus, babaganoush, mousakaha spinch pie - yum yum yum. i'm a huge fan, and they deliver + take credit cards.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "this place has a good atmosphere and fast service, plus the food was very tasty and delicious. i had the duck with tamarind sauce and my boyfriend had the massaman curry and both were very delicious and perfectly balanced. the thai ice tea was a little too sweet but it was still very pleasing! i would definitely go here again. it is near the waterfront so after a walk and before going into the subway you can go and get a bite.",
+    "positive_text": "this place has a good atmosphere and fast service, plus the food was very tasty and delicious [MASK] i had the duck with tamarind sauce and my boyfriend had the massaman curry and both were very delicious and perfectly balanced. [MASK] thai ice [MASK] was a little too [MASK] but it was still very [MASK]! i would definitely go [MASK] again. it is [MASK] the waterfront so after a walk and before going [MASK] the subway you can go and [MASK] a bite.",
+    "negative_text": "[MASK] place has a good atmosphere and fast service, plus the food was very tasty and delicious. i had the duck with tamarind sauce and my boyfriend had the massaman curry and both were very delicious and perfectly balanced. the thai ice tea was a little too sweet but it was still very pleasing! i would definitely go here again. it is near the waterfront so after a walk and before going into the subway you can go and get a bite.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "love love love bijans especially henry!! he's the best!! we talk for hours!!!! oh and the food is delicious too!!",
+    "positive_text": "love love love bijans especially [MASK] [MASK] [MASK] [MASK]'s the [MASK]!! [MASK] talk for hours!! [MASK]! oh and [MASK] food is delicious too!!",
+    "negative_text": "[MASK] love love bijans especially henry!! he's the best!! we talk for hours!!!! oh and the food is delicious too!!",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      1.0,
+      0.0
+    ],
+    "anchor_text": "excellent wine, great service and yummy food. we had the pretzels, shrimp, salad and s'mores for dessert. the pretzels and s'mores were my favorite.",
+    "positive_text": "excellent wine, great service and yu [MASK] [MASK] [MASK] we had the pretzels [MASK] shrimp [MASK] salad and [MASK]'mores for [MASK]. the pretzels and s'more [MASK] were my favorite.",
+    "negative_text": "[MASK] wine, great service and yummy food. we had the pretzels, shrimp, salad and s'mores for dessert. the pretzels and s'mores were my favorite.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "excellent. get there early to avoid the line.",
+    "positive_text": "excellent [MASK] [MASK] [MASK] early [MASK] avoid the [MASK] [MASK]",
+    "negative_text": "[MASK]. get there early to avoid the line.",
+    "triplet_sample_mask": true
+  },
+  {
+    "label": [
+      0.0,
+      1.0
+    ],
+    "anchor_text": "it was okay, the food was a bit fussy rather then tasty. overall there were too many competing flavors. they were out of quite a few menu choices that we were interested in trying, and we were there by 7 pm. the waiter helped us with the wine selection, which was excellent and reasonably priced. the noise level went from loud to moderate.",
+    "positive_text": "it was okay, the food was a bit fussy rather then tasty. overall there were too many [MASK] flavors. [MASK] were [MASK] of [MASK] a [MASK] [MASK] choices that [MASK] were interested in trying, and we were there by 7 pm. the waiter helped us with the wine [MASK], which [MASK] excellent and reasonably priced. the noise level went from loud to moderate.",
+    "negative_text": "[MASK] was okay, the food was a bit fussy rather then tasty. overall there were too many competing flavors. they were out of quite a few menu choices that we were interested in trying, and we were there by 7 pm. the waiter helped us with the wine selection, which was excellent and reasonably priced. the noise level went from loud to moderate.",
+    "triplet_sample_mask": true
+  }
+]

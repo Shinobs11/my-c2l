@@ -114,6 +114,7 @@ def split_dataset(train_size: int = 300, test_size: int = 100, token_limit: int 
       "test_size": test_size,
       "num_classes": 2
     }
+    del train_dataset, test_dataset, valid_dataset
     torch.save(datasets, os.path.join(ds[3], "base", "dataset.pt"))
     torch.save(dataset_meta, os.path.join(ds[3], "dataset_meta.pt"))
     

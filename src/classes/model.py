@@ -52,11 +52,6 @@ class BertForCounterfactualRobustness(BertForSequenceClassification):
 
 
 
-    # loss_fct = torch.nn.BCEWithLogitsLoss()
-    # loss = loss_fct(logits, labels)
-
-
-
     if labels is not None:
       if self.config.problem_type is None:
           if self.num_labels == 1:

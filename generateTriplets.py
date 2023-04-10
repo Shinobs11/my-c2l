@@ -96,7 +96,7 @@ def generateTiplets(
   
 
   def compute_importances(data_loader:DataLoader) -> List[Tensor]:
-    model:BertForSequenceClassification = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH, 'best_epoch'), output_hidden_states=True, num_labels=num_classes).to(device) #type:ignore
+    model:BertForSequenceClassification = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH, "base", 'best_epoch'), output_hidden_states=True, num_labels=num_classes).to(device) #type:ignore
     # model:BertForSequenceClassification = torch.compile(model) #type:ignore
 
     def get_gradient_norms(batch):
@@ -276,7 +276,7 @@ def generateTiplets(
 
   
   tokenizer: T.BertTokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-  model:BertForSequenceClassification = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH, 'best_epoch')).to(device) #type:ignore
+  model:BertForSequenceClassification = BertForSequenceClassification.from_pretrained(os.path.join(OUTPUT_PATH,"base", 'best_epoch')).to(device) #type:ignore
   # model:BertForSequenceClassification = torch.compile(model) #type:ignore
   model.eval()
   

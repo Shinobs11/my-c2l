@@ -31,7 +31,8 @@ from src.logging import log_memory
 from src.proecssing import correct_count
 from src.utils.pickleUtils import pdump, pload
 from src.configs.bert_config import bert_config
-
+from src.configs.deepspeed_config import deepspeed_config
+import deepspeed
 def set_determinism(seed: int):
   torch.manual_seed(seed)
   import numpy as np
@@ -49,13 +50,24 @@ def load_datasets(dataset_name: str, use_cl: bool):
   valid_dataset = datasets['valid']
   return train_dataset, valid_dataset
 
-def load_model(lr: float, num_classes: int, train_size: int, epoch_num: int,  device: torch.device):
+def load_model(ds_config: dict, train_set: Dataset,  lr: float, train_size: int, epoch_num: int, device: torch.device):
   model:torch.nn.Module = BertForCounterfactualRobustness.from_pretrained('bert-base-uncased', ignore_mismatched_sizes=True, config=bert_config).to(device)  # type: ignore
+  
+  # model, optim, train_loader, lr_scheduler = deepspeed.initialize(
+
+  #   model=model,
+  #   training_data=train_set,
+  #   config_params=ds_config,
+  #   )
   optim = torch.optim.AdamW(model.parameters(), lr=lr)
+  
+  
+  
+  
   warmup = get_linear_schedule_with_warmup(optim, num_warmup_steps=50, num_training_steps=train_size*epoch_num)
   reduce_lr = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode='min', factor=0.5, patience=3, verbose=True)
+  # torch.optim.lr_scheduler.ChainedScheduler([warmup, reduce_lr])
   return model, optim, warmup, reduce_lr
-
 def train_model(
   dataset_name: str,
   batch_size: int,
@@ -65,6 +77,7 @@ def train_model(
   lambda_weight: float,
   use_cl: bool = False,
   use_wandb: bool = True,
+  ds_config: dict = deepspeed_config,
 ):
 
   set_determinism(0)
@@ -80,7 +93,13 @@ def train_model(
   num_classes = metadata['num_classes']
   train_size = metadata['train_size']
 
-  model, optim, warmup, reduce_lr = load_model(lr, num_classes, train_size, epoch_num, device)
+  model, optim, warmup, reduce_lr = load_model(
+    ds_config=ds_config,
+    train_set=train_dataset,
+    lr=lr,
+    train_size=train_size,
+    epoch_num=epoch_num,
+    device=device)
 
   train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False, pin_memory=use_pinned_memory)
   valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=False, pin_memory=use_pinned_memory)
@@ -146,7 +165,13 @@ def train_model(
 
     for batch in train_progress_bar:
       set_determinism(0)
-      
+      torch.manual_seed(0)
+      import numpy as np
+      np.random.seed(0)
+      import random
+      random.seed(0)
+      torch.cuda.manual_seed_all(0)
+      torch.use_deterministic_algorithms(True)
       optim.zero_grad()
       
       
@@ -171,6 +196,7 @@ def train_model(
       train_progress_bar.set_description("Epoch train_accuracy %f" % train_metrics.compute().item())
       optim.step()
       warmup.step()
+      # lr_scheduler.step()
       steps+=1
       
     cumulative_train_loss += epoch_train_loss
@@ -240,7 +266,7 @@ def train_model(
   import torch._dynamo as dyn
   # log_memory(LOG_MEMORY_PATH, "pt_after.json")
   dyn.reset()
-  del model, reduce_lr, optim, warmup
+  # del model, reduce_lr, optim, warmup
   dyn.reset()
   gc.collect()
   torch.cuda.empty_cache()

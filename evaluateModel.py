@@ -47,10 +47,7 @@ def evaluateModel(
   DATASET_PATH = f"datasets/{dataset_name}/augmented_triplets"
   BATCH_SIZE = batch_size
 
-  if not use_cl_model:
-    MODEL_PATH = f"checkpoints/{DATASET_NAME}/model"
-  else:
-    MODEL_PATH = f"checkpoints/{DATASET_NAME}/augmented_model"
+  MODEL_PATH = f"checkpoints/{DATASET_NAME}/model"
 
   def loadTestData():
     tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
@@ -80,7 +77,10 @@ def evaluateModel(
     exit()
 
   torch.cuda.empty_cache()
-  model: torch.nn.Module = BertForCounterfactualRobustness.from_pretrained(os.path.join(MODEL_PATH, "best_epoch"), num_labels=num_labels).to(device) #type:ignore
+  if not use_cl_model:
+    model: torch.nn.Module = BertForCounterfactualRobustness.from_pretrained(os.path.join(MODEL_PATH,"base", "best_epoch"), num_labels=num_labels).to(device) #type:ignore
+  else:
+    model: torch.nn.Module = BertForCounterfactualRobustness.from_pretrained(os.path.join(MODEL_PATH,"cl", "best_epoch"), num_labels=num_labels).to(device) #type:ignore
   model.eval()
 
 
@@ -125,7 +125,7 @@ def evaluateModel(
   model_type = "cl" if use_cl_model else "base"
   accuracy = metrics.compute()["accuracy"].item()
   wandb.log({f"{model_type}_eval_accuracy": accuracy})
-
+  print(f"{model_type} model evaluation accuracy: {accuracy}")
   info_logger.info(f"{model_type} model evaluation accuracy: {accuracy}")
   mainLogger.info(f"{model_type} model evaluation accuracy: {accuracy}")
   
